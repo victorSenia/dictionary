@@ -12,6 +12,8 @@ public class ParseWords extends ConfigParent {
     private final String topicFlag = "\t";
     private final String topicDelimiter = "";
     private final String path = "";
+    private final String rootTopic = "";
+
 
     private final List<String> articles = new ArrayList<>();
 
@@ -87,7 +89,7 @@ public class ParseWords extends ConfigParent {
         put("path", path);
     }
     public String getRootTopic() {
-        return getOrDefault("rootTopic", "");
+        return getOrDefault("rootTopic", rootTopic);
     }
 
     public void setRootTopic(String rootTopic) {

@@ -14,6 +14,8 @@ public class WordCriteria implements Serializable {
     private String languageFrom;
     private Set<String> languageTo;
     private Set<String> playTranslationFor;
+    private boolean noRootTopic;
+    private boolean noTopic;
     private long shuffleRandom = -1;
 
     public Double getKnowledgeFrom() {
@@ -86,6 +88,22 @@ public class WordCriteria implements Serializable {
 
     public void setLanguageTo(Set<String> languageTo) {
         this.languageTo = languageTo;
+    }
+
+    public boolean isNoRootTopic() {
+        return noRootTopic;
+    }
+
+    public void setNoRootTopic(boolean noRootTopic) {
+        this.noRootTopic = noRootTopic;
+    }
+
+    public boolean isNoTopic() {
+        return noTopic;
+    }
+
+    public void setNoTopic(boolean noTopic) {
+        this.noTopic = noTopic;
     }
 
     public Set<String> getPlayTranslationFor() {

@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public interface ExternalWordProvider {
 
-    List<Word> findWords(WordCriteria topics);
+    List<Word> findWords(WordCriteria criteria);
 
     default List<String> findTopics(String language) {
         return findTopics(language, 2).stream().map(Topic::getName).sorted().collect(Collectors.toList());
