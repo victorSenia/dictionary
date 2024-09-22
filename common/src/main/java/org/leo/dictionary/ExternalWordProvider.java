@@ -11,6 +11,10 @@ public interface ExternalWordProvider {
 
     List<Word> findWords(WordCriteria criteria);
 
+    default int countWords(WordCriteria wordCriteria) {
+        return findWords(wordCriteria).size();
+    }
+
     default List<String> findTopics(String language) {
         return findTopics(language, 2).stream().map(Topic::getName).sorted().collect(Collectors.toList());
     }

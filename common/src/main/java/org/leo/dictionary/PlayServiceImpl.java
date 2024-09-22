@@ -217,10 +217,6 @@ public class PlayServiceImpl implements PlayService, ExternalWordProvider, Exter
                 while (wordsIterator.hasNext()) {
                     Word word = wordsIterator.next();
                     playWord(word);
-//                    if (word.getKnowledge() >= 1.) {
-//                        wordsIterator.remove();
-//                        knownWords.add(word);
-//                    }
                     if (!wordsIterator.hasNext()) {
                         wordsIterator = unknownWords.listIterator();
                     }
