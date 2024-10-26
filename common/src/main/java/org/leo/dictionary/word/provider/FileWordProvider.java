@@ -60,6 +60,7 @@ public class FileWordProvider implements WordProvider {
     public List<Topic> findTopicsWithRoot(String language, String rootTopic, int upToLevel) {
         return findTopics(language, upToLevel);
     }
+
     public void loadWords() {
         try (BufferedReader fileReader = getBufferedReader()) {
             topics = new HashMap<>();

@@ -3,8 +3,9 @@ package org.leo.dictionary.entity;
 import java.io.Serializable;
 import java.util.Set;
 
-public class SentenceCriteria implements Serializable {
+public class GrammarCriteria implements Serializable {
     private String language;
+    private Set<String> hints;
     private Set<String> topicsOr;
     private String rootTopic;
 
@@ -14,6 +15,14 @@ public class SentenceCriteria implements Serializable {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public Set<String> getHints() {
+        return hints;
+    }
+
+    public void setHints(Set<String> hints) {
+        this.hints = hints;
     }
 
     public Set<String> getTopicsOr() {

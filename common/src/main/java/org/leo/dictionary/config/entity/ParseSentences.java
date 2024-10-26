@@ -1,14 +1,16 @@
 package org.leo.dictionary.config.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ParseSentences extends ConfigParent {
     private final String language = "";
     private final String path = "";
     private final String rootTopic = "";
-    private final String topicFlag = "\t_TOPIC_ ";
-    private final String hintFlag = "\t_HINT_ ";
+    private final String topicFlag = "\t";
+    private final List<String> languagesTo = new ArrayList<>();
+    private final String translationDelimiter = "\\|";
     private final String delimiter = "\\|";
-    private final String placeholder = "___";
-    private final boolean hintAtSameLine = false;
 
     public String getLanguage() {
         return getOrDefault("language", language);
@@ -17,6 +19,7 @@ public class ParseSentences extends ConfigParent {
     public void setLanguage(String language) {
         put("language", language);
     }
+
     public String getTopicFlag() {
         return getOrDefault("topicFlag", topicFlag);
     }
@@ -25,12 +28,12 @@ public class ParseSentences extends ConfigParent {
         put("topicFlag", topicFlag);
     }
 
-    public String getHintFlag() {
-        return getOrDefault("hintFlag", hintFlag);
+    public String getPath() {
+        return getOrDefault("path", path);
     }
 
-    public void setHintFlag(String hintFlag) {
-        put("hintFlag", hintFlag);
+    public void setPath(String path) {
+        put("path", path);
     }
 
     public String getDelimiter() {
@@ -41,20 +44,6 @@ public class ParseSentences extends ConfigParent {
         put("delimiter", delimiter);
     }
 
-    public String getPath() {
-        return getOrDefault("path", path);
-    }
-
-    public void setPath(String path) {
-        put("path", path);
-    }
-    public String getPlaceholder() {
-        return getOrDefault("placeholder", placeholder);
-    }
-
-    public void setPlaceholder(String placeholder) {
-        put("placeholder", placeholder);
-    }
     public String getRootTopic() {
         return getOrDefault("rootTopic", rootTopic);
     }
@@ -62,11 +51,20 @@ public class ParseSentences extends ConfigParent {
     public void setRootTopic(String rootTopic) {
         put("rootTopic", rootTopic);
     }
-    public boolean getHintAtSameLine() {
-        return getOrDefault("hintAtSameLine", hintAtSameLine);
+
+    public List<String> getLanguagesTo() {
+        return getOrDefault("languagesTo", languagesTo);
     }
 
-    public void setHintAtSameLine(boolean hintAtSameLine) {
-        put("hintAtSameLine", hintAtSameLine);
+    public void setLanguagesTo(List<String> languagesTo) {
+        put("languagesTo", languagesTo);
+    }
+
+    public String getTranslationDelimiter() {
+        return getOrDefault("translationDelimiter", translationDelimiter);
+    }
+
+    public void setTranslationDelimiter(String translationDelimiter) {
+        put("translationDelimiter", translationDelimiter);
     }
 }

@@ -15,14 +15,6 @@ public class WindowsAudioService implements AudioService {
 
     private Process powerShellProcess = null;
 
-    public void setup() throws IOException {
-        voices = new HashMap<>();
-        List<String> cultures = powerShellResult(getCulturesCommand());
-        for (String culture : cultures) {
-            voices.put(culture.replace('-', '_'), powerShellResult(getVoicesCommand(culture)));
-        }
-    }
-
     private static String getCulturesCommand() {
         return "Add-Type -AssemblyName System.Speech; $speechSynthesizer=(New-Object System.Speech.Synthesis.SpeechSynthesizer); " +
                 "$speechSynthesizer.GetInstalledVoices().VoiceInfo.Culture.Name;";
@@ -31,6 +23,14 @@ public class WindowsAudioService implements AudioService {
     private static String getVoicesCommand(String Culture) {
         return "Add-Type -AssemblyName System.Speech; $speechSynthesizer=(New-Object System.Speech.Synthesis.SpeechSynthesizer); " +
                 "$speechSynthesizer.GetInstalledVoices((New-Object CultureInfo('" + Culture + "'))).VoiceInfo.Name;";
+    }
+
+    public void setup() throws IOException {
+        voices = new HashMap<>();
+        List<String> cultures = powerShellResult(getCulturesCommand());
+        for (String culture : cultures) {
+            voices.put(culture.replace('-', '_'), powerShellResult(getVoicesCommand(culture)));
+        }
     }
 
     private List<String> powerShellResult(String powerShellCommand) throws IOException {
@@ -62,7 +62,7 @@ public class WindowsAudioService implements AudioService {
                 "$speechSynthesizer=(New-Object System.Speech.Synthesis.SpeechSynthesizer); " +
                 (voices.containsKey(language) ? "$speechSynthesizer.SelectVoice('" + voices.get(language).get(0) + "'); " : "") +
                 "$speechSynthesizer.rate=0; " +
-                "$speechSynthesizer.Speak('" + text.replace("'","''") + "');";
+                "$speechSynthesizer.Speak('" + text.replace("'", "''") + "');";
         try {//TODO language setting
             LOGGER.info(language + " " + text);
             powerShellResult(command);

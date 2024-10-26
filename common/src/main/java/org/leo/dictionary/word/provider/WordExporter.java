@@ -33,6 +33,7 @@ public abstract class WordExporter {
     public static final String ELEMENT_DIVIDER = "=";
     private final static Logger LOGGER = Logger.getLogger(WordExporter.class.getName());
     private BufferedWriter writer;
+    private String rootTopicName;
 
     public static boolean notEmptyString(String string) {
         return string != null && !string.isEmpty();
@@ -67,8 +68,6 @@ public abstract class WordExporter {
             throw e;
         }
     }
-
-    private String rootTopicName;
 
     private void writeWordsForTopic(List<Word> list, String rootTopicName) throws IOException {
         this.rootTopicName = rootTopicName;

@@ -88,6 +88,7 @@ public class ParseWords extends ConfigParent {
     public void setPath(String path) {
         put("path", path);
     }
+
     public String getRootTopic() {
         return getOrDefault("rootTopic", rootTopic);
     }

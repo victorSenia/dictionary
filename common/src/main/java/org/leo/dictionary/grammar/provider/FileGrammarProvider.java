@@ -1,9 +1,9 @@
 package org.leo.dictionary.grammar.provider;
 
-import org.leo.dictionary.config.entity.ParseSentences;
+import org.leo.dictionary.config.entity.ParseGrammar;
+import org.leo.dictionary.entity.GrammarCriteria;
+import org.leo.dictionary.entity.GrammarSentence;
 import org.leo.dictionary.entity.Hint;
-import org.leo.dictionary.entity.Sentence;
-import org.leo.dictionary.entity.SentenceCriteria;
 import org.leo.dictionary.entity.Topic;
 
 import java.io.*;
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 public class FileGrammarProvider implements GrammarProvider {
     private final static Logger LOGGER = Logger.getLogger(FileGrammarProvider.class.getName());
 
-    protected ParseSentences configuration;
+    protected ParseGrammar configuration;
     protected Set<Hint> hints;
     protected Set<Topic> topics;
     protected Hint hint;
@@ -26,18 +26,18 @@ public class FileGrammarProvider implements GrammarProvider {
     protected Topic rootTopic;
 
     protected Topic topic;
-    protected List<Sentence> sentences;
+    protected List<GrammarSentence> sentences;
 
-    public void setConfiguration(ParseSentences configuration) {
+    public void setConfiguration(ParseGrammar configuration) {
         this.configuration = configuration;
     }
 
     @Override
-    public List<Sentence> findSentences(SentenceCriteria criteria) {
+    public List<GrammarSentence> findSentences(GrammarCriteria criteria) {
         if (sentences == null) {
             loadSentences();
         }
-        Stream<Sentence> stream = sentences.stream();
+        Stream<GrammarSentence> stream = sentences.stream();
         if (criteria.getTopicsOr() != null && !criteria.getTopicsOr().isEmpty()) {
             stream = stream.filter(s -> criteria.getTopicsOr().contains(s.getHint().getTopic().getName()));
         }
@@ -85,7 +85,7 @@ public class FileGrammarProvider implements GrammarProvider {
                 } else {
                     Matcher matcher = pattern.matcher(line);
                     if (matcher.matches()) {
-                        Sentence sentence = new Sentence();
+                        GrammarSentence sentence = new GrammarSentence();
                         sentence.setSentencePrefix(matcher.group(1).trim());
                         sentence.setSentenceSuffix(matcher.group(2).trim());
                         sentence.setLanguage(configuration.getLanguage());

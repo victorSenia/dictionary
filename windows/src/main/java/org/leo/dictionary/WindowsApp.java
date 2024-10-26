@@ -11,19 +11,18 @@ import java.awt.event.WindowEvent;
 
 public class WindowsApp {
 
+    private final JList<Word> wordList = new JList<>();
     private PlayService playService;
     private ExternalWordProvider wordProvider;
     private ExternalVoiceService voiceService;
-
-    public void setPlayService(PlayService playService) {
-        this.playService = playService;
-    }
 
     public static void main(String[] args) {
         DaggerWindowsAppComponent.create().buildWindowsApp().showUi();
     }
 
-    private final JList<Word> wordList = new JList<>();
+    public void setPlayService(PlayService playService) {
+        this.playService = playService;
+    }
 
     public void showUi() {
         playService.findWords(new WordCriteria());
