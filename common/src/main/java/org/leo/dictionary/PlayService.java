@@ -1,14 +1,16 @@
 package org.leo.dictionary;
 
 import org.leo.dictionary.entity.Word;
-import org.leo.dictionary.entity.WordCriteria;
 
 import java.util.List;
+import java.util.Set;
 
 public interface PlayService {
     void play();
 
     void pause();
+
+    void setPlayTranslationFor(Set<String> playTranslationFor);
 
     void next();
 
@@ -20,13 +22,5 @@ public interface PlayService {
 
     void setUiUpdater(UiUpdater uiUpdater);
 
-    void safeDelete(int index);
-
-    void safeUpdate(int index, Word updatedWord);
-
-    void safeAdd(Word addedWord);
-
-    List<Word> findWords(WordCriteria topics);
-
-    List<Word> getUnknownWords();
+    void setWords(List<Word> words);
 }

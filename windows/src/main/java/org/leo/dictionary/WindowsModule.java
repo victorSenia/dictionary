@@ -91,11 +91,10 @@ public class WindowsModule {
 
     @Provides
     @Singleton
-    public WindowsApp provideWindowsApp(PlayServiceImpl playService) {
+    public WindowsApp provideWindowsApp(PlayServiceImpl playService, WordProvider wordProvider) {
         WindowsApp windowsApp = new WindowsApp();
         windowsApp.setPlayService(playService);
-        windowsApp.setExternalWordProvider(playService);
-        windowsApp.setExternalVoiceService(playService);
+        windowsApp.setExternalWordProvider(wordProvider);
         return windowsApp;
     }
 

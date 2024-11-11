@@ -8,14 +8,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 
 public class WindowsApp {
 
     private final JList<Word> wordList = new JList<>();
     private PlayService playService;
     private ExternalWordProvider wordProvider;
-    private ExternalVoiceService voiceService;
-
     public static void main(String[] args) {
         DaggerWindowsAppComponent.create().buildWindowsApp().showUi();
     }
@@ -25,7 +24,7 @@ public class WindowsApp {
     }
 
     public void showUi() {
-        playService.findWords(new WordCriteria());
+        List<Word> words = findAndSetWords(new WordCriteria());
         JFrame frame = new JFrame("Dictionary");
         frame.setSize(800, 500);
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -34,7 +33,7 @@ public class WindowsApp {
         frame.setLayout(new BorderLayout(50, 50));
         frame.add(panel, BorderLayout.CENTER);
 
-        updateWithWords();
+        updateWithWords(words);
         wordList.setCellRenderer(new DefaultListCellRenderer() {
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 Component component = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
@@ -78,8 +77,8 @@ public class WindowsApp {
         frame.setVisible(true);
     }
 
-    private void updateWithWords() {
-        wordList.setListData(playService.getUnknownWords().toArray(new Word[0]));
+    private void updateWithWords(List<Word> words) {
+        wordList.setListData(words.toArray(new Word[0]));
         wordList.setSelectedIndex(0);
     }
 
@@ -124,8 +123,8 @@ public class WindowsApp {
             public void actionPerformed(ActionEvent e) {
                 WordCriteria criteria = new WordCriteria();
                 criteria.setTopicsOr(topics.getSelectedValuesList());
-                playService.findWords(criteria);
-                SwingUtilities.invokeLater(() -> updateWithWords());
+                List<Word> words = findAndSetWords(criteria);
+                SwingUtilities.invokeLater(() -> updateWithWords(words));
             }
         });
         menu.add(orTopics);
@@ -135,8 +134,8 @@ public class WindowsApp {
             public void actionPerformed(ActionEvent e) {
                 WordCriteria criteria = new WordCriteria();
                 criteria.setTopicsAnd(topics.getSelectedValuesList());
-                playService.findWords(criteria);
-                SwingUtilities.invokeLater(() -> updateWithWords());
+                List<Word> words =  findAndSetWords(criteria);
+                SwingUtilities.invokeLater(() -> updateWithWords(words));
             }
         });
         menu.add(andTopics);
@@ -150,12 +149,14 @@ public class WindowsApp {
         return panel;
     }
 
-    public void setExternalWordProvider(ExternalWordProvider wordProvider) {
-        this.wordProvider = wordProvider;
+    private List<Word> findAndSetWords(WordCriteria criteria) {
+        List<Word> words = wordProvider.findWords(criteria);
+        playService.setWords(words);
+        return words;
     }
 
-    public void setExternalVoiceService(ExternalVoiceService voiceService) {
-        this.voiceService = voiceService;
+    public void setExternalWordProvider(ExternalWordProvider wordProvider) {
+        this.wordProvider = wordProvider;
     }
 
     static class FontExtend extends Font {
