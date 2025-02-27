@@ -1,8 +1,9 @@
 package org.leo.dictionary.entity;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Hint {
+public class Hint implements Serializable {
     private long id;
     private String hint;
     private List<String> variants;

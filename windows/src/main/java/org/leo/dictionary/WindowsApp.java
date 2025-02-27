@@ -1,5 +1,6 @@
 package org.leo.dictionary;
 
+import org.leo.dictionary.entity.Topic;
 import org.leo.dictionary.entity.Word;
 import org.leo.dictionary.entity.WordCriteria;
 
@@ -9,12 +10,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class WindowsApp {
 
     private final JList<Word> wordList = new JList<>();
     private PlayService playService;
     private ExternalWordProvider wordProvider;
+
     public static void main(String[] args) {
         DaggerWindowsAppComponent.create().buildWindowsApp().showUi();
     }
@@ -122,7 +125,12 @@ public class WindowsApp {
             @Override
             public void actionPerformed(ActionEvent e) {
                 WordCriteria criteria = new WordCriteria();
-                criteria.setTopicsOr(topics.getSelectedValuesList());
+                List<Topic> selectedValuesList = topics.getSelectedValuesList().stream().map(s -> {
+                    Topic t = new Topic();
+                    t.setName(s);
+                    return t;
+                }).collect(Collectors.toList());
+                criteria.setTopicsOr(selectedValuesList);
                 List<Word> words = findAndSetWords(criteria);
                 SwingUtilities.invokeLater(() -> updateWithWords(words));
             }
@@ -134,7 +142,7 @@ public class WindowsApp {
             public void actionPerformed(ActionEvent e) {
                 WordCriteria criteria = new WordCriteria();
                 criteria.setTopicsAnd(topics.getSelectedValuesList());
-                List<Word> words =  findAndSetWords(criteria);
+                List<Word> words = findAndSetWords(criteria);
                 SwingUtilities.invokeLater(() -> updateWithWords(words));
             }
         });

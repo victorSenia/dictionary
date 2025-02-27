@@ -35,17 +35,23 @@ public class FileSentenceProvider implements SentenceProvider {
         }
         Stream<Sentence> stream = sentences.stream();
         if (criteria.getTopicsOr() != null && !criteria.getTopicsOr().isEmpty()) {
-            stream = stream.filter(s -> criteria.getTopicsOr().contains(s.getTopic().getName()));
+            Set<String> topicNames = criteria.getTopicsOr().stream().map(Topic::getName).collect(Collectors.toSet());
+            stream = stream.filter(s -> topicNames.contains(s.getTopic().getName()));
         }
         return stream.collect(Collectors.toList());
     }
 
     @Override
-    public List<Topic> findTopics(String language, String rootTopic, int level) {
+    public List<Topic> findTopics(String language, Topic rootTopic, int level) {
         if (level > 1) {
             return new ArrayList<>(topics);
         }
         return Collections.singletonList(this.rootTopic);
+    }
+
+    @Override
+    public List<Topic> findTopics(String language, Set<Topic> rootTopics, int level) {
+        return findTopics(language, (Topic) null, level);
     }
 
     public void loadSentences() {

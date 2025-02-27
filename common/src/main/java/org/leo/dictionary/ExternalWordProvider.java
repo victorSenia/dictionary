@@ -5,6 +5,7 @@ import org.leo.dictionary.entity.Word;
 import org.leo.dictionary.entity.WordCriteria;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public interface ExternalWordProvider {
@@ -19,7 +20,9 @@ public interface ExternalWordProvider {
         return findTopics(language, 2).stream().map(Topic::getName).sorted().collect(Collectors.toList());
     }
 
-    List<Topic> findTopicsWithRoot(String language, String rootTopic, int upToLevel);
+    List<Topic> findTopicsWithRoot(String language, Topic rootTopic, int upToLevel);
+
+    List<Topic> findTopicsWithRoot(String language, Set<Topic> rootTopics, int upToLevel);
 
     List<Topic> findTopics(String language, int level);
 

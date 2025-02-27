@@ -9,8 +9,8 @@ public class WordCriteria implements Serializable {
     private Double knowledgeFrom;
     private Double knowledgeTo;
     private Set<String> topicsAnd;
-    private Set<String> topicsOr;
-    private String rootTopic;
+    private Set<Topic> topicsOr;
+    private Set<Topic> rootTopics;
     private String languageFrom;
     private Set<String> languageTo;
     private Set<String> playTranslationFor;
@@ -54,24 +54,24 @@ public class WordCriteria implements Serializable {
         this.topicsAnd = topicsAnd;
     }
 
-    public Set<String> getTopicsOr() {
+    public Set<Topic> getTopicsOr() {
         return topicsOr;
     }
 
-    public void setTopicsOr(List<String> topicsOr) {
+    public void setTopicsOr(List<Topic> topicsOr) {
         this.topicsOr = new HashSet<>(topicsOr);
     }
 
-    public void setTopicsOr(Set<String> topicsOr) {
+    public void setTopicsOr(Set<Topic> topicsOr) {
         this.topicsOr = topicsOr;
     }
 
-    public String getRootTopic() {
-        return rootTopic;
+    public Set<Topic> getRootTopics() {
+        return rootTopics;
     }
 
-    public void setRootTopic(String rootTopic) {
-        this.rootTopic = rootTopic;
+    public void setRootTopics(Set<Topic> rootTopics) {
+        this.rootTopics = rootTopics;
     }
 
     public String getLanguageFrom() {

@@ -38,29 +38,41 @@ public class FileGrammarProvider implements GrammarProvider {
             loadSentences();
         }
         Stream<GrammarSentence> stream = sentences.stream();
-        if (criteria.getTopicsOr() != null && !criteria.getTopicsOr().isEmpty()) {
-            stream = stream.filter(s -> criteria.getTopicsOr().contains(s.getHint().getTopic().getName()));
-        }
         if (criteria.getHints() != null && !criteria.getHints().isEmpty()) {
-            stream = stream.filter(s -> criteria.getHints().contains(s.getHint().getHint()));
+            Set<String> hintNames = criteria.getHints().stream().map(Hint::getHint).collect(Collectors.toSet());
+            stream = stream.filter(s -> hintNames.contains(s.getHint().getHint()));
+        } else if (criteria.getTopicsOr() != null && !criteria.getTopicsOr().isEmpty()) {
+            Set<String> topicNames = criteria.getTopicsOr().stream().map(Topic::getName).collect(Collectors.toSet());
+            stream = stream.filter(s -> topicNames.contains(s.getHint().getTopic().getName()));
         }
         return stream.collect(Collectors.toList());
     }
 
     @Override
-    public List<Hint> findHints(String language, String rootTopic, Set<String> topics) {
+    public List<Hint> findHints(String language, Topic rootTopic, Set<Topic> topics) {
         if (topics != null && !topics.isEmpty()) {
-            return hints.stream().filter(h -> topics.contains(h.getTopic().getName())).collect(Collectors.toList());
+            Set<String> topicNames = topics.stream().map(Topic::getName).collect(Collectors.toSet());
+            return hints.stream().filter(h -> topicNames.contains(h.getTopic().getName())).collect(Collectors.toList());
         }
         return new ArrayList<>(hints);
     }
 
     @Override
-    public List<Topic> findTopics(String language, String rootTopic, int level) {
+    public List<Hint> findHints(String language, Set<Topic> rootTopics, Set<Topic> topics) {
+        return findHints(language, (Topic) null, topics);
+    }
+
+    @Override
+    public List<Topic> findTopics(String language, Topic rootTopic, int level) {
         if (level > 1) {
             return new ArrayList<>(topics);
         }
         return Collections.singletonList(this.rootTopic);
+    }
+
+    @Override
+    public List<Topic> findTopics(String language, Set<Topic> rootTopics, int level) {
+        return findTopics(language, (Topic) null, level);
     }
 
     public void loadSentences() {

@@ -5,9 +5,9 @@ import java.util.Set;
 
 public class GrammarCriteria implements Serializable {
     private String language;
-    private Set<String> hints;
-    private Set<String> topicsOr;
-    private String rootTopic;
+    private Set<Hint> hints;
+    private Set<Topic> topicsOr;
+    private Set<Topic> rootTopics;
 
     public String getLanguage() {
         return language;
@@ -17,27 +17,27 @@ public class GrammarCriteria implements Serializable {
         this.language = language;
     }
 
-    public Set<String> getHints() {
+    public Set<Hint> getHints() {
         return hints;
     }
 
-    public void setHints(Set<String> hints) {
+    public void setHints(Set<Hint> hints) {
         this.hints = hints;
     }
 
-    public Set<String> getTopicsOr() {
+    public Set<Topic> getTopicsOr() {
         return topicsOr;
     }
 
-    public void setTopicsOr(Set<String> topicsOr) {
+    public void setTopicsOr(Set<Topic> topicsOr) {
         this.topicsOr = topicsOr;
     }
 
-    public String getRootTopic() {
-        return rootTopic;
+    public Set<Topic> getRootTopics() {
+        return rootTopics;
     }
 
-    public void setRootTopic(String rootTopic) {
-        this.rootTopic = rootTopic;
+    public void setRootTopics(Set<Topic> rootTopics) {
+        this.rootTopics = rootTopics;
     }
 }

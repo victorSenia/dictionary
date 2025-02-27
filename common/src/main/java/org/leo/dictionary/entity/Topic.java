@@ -1,8 +1,9 @@
 package org.leo.dictionary.entity;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Topic {
+public class Topic implements Serializable {
 
     private long id;
     private String language;

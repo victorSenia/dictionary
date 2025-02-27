@@ -8,6 +8,7 @@ import org.leo.dictionary.entity.WordCriteria;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class TestWordProvider implements WordProvider {
     @Override
@@ -25,7 +26,12 @@ public class TestWordProvider implements WordProvider {
     }
 
     @Override
-    public List<Topic> findTopicsWithRoot(String language, String rootTopic, int upToLevel) {
+    public List<Topic> findTopicsWithRoot(String language, Topic rootTopic, int upToLevel) {
+        return null;
+    }
+
+    @Override
+    public List<Topic> findTopicsWithRoot(String language, Set<Topic> rootTopics, int upToLevel) {
         return null;
     }
 
