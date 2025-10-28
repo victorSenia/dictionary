@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.leo.dictionary.controller.WordsListFragmentController"
+      spacing="10" alignment="CENTER">
+
+    <Label text="Words" style="-fx-font-size: 18;"/>
+    <ListView fx:id="wordList"/>
+</VBox>

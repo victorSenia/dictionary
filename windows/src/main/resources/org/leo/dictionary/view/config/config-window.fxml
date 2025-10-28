@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.leo.dictionary.controller.ConfigWindowController"
+            prefWidth="600" prefHeight="400" style="-fx-padding: 10;">
+
+    <top>
+        <Label text="Configuration"
+               style="-fx-font-size: 18;"
+               BorderPane.alignment="CENTER"/>
+    </top>
+
+    <center>
+        <TabPane fx:id="tabPane">
+
+            <Tab text="General" closable="false">
+                <fx:include fx:id="general" source="general-config.fxml"/>
+            </Tab>
+
+            <Tab text="Repeat" closable="false">
+                <fx:include fx:id="repeat" source="repeat-config.fxml"/>
+            </Tab>
+
+            <Tab text="Translation" closable="false">
+                <fx:include fx:id="translation" source="translation-config.fxml"/>
+            </Tab>
+
+            <Tab text="Spelling" closable="false">
+                <fx:include fx:id="spelling" source="spelling-config.fxml"/>
+            </Tab>
+
+        </TabPane>
+    </center>
+</BorderPane>

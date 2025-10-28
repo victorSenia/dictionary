@@ -31,9 +31,6 @@ public class FileWordProvider implements WordProvider {
             loadWords();
         }
         Stream<Word> stream = words.stream();
-        if (wordCriteria.getTopicsAnd() != null && !wordCriteria.getTopicsAnd().isEmpty()) {
-            stream = stream.filter(word -> word.getTopics().stream().map(Topic::getName).collect(Collectors.toSet()).containsAll(wordCriteria.getTopicsAnd()));
-        }
         if (wordCriteria.getTopicsOr() != null && !wordCriteria.getTopicsOr().isEmpty()) {
             Set<String> topicsNames = wordCriteria.getTopicsOr().stream().map(Topic::getName).collect(Collectors.toSet());
             stream = stream.filter(word -> word.getTopics().stream().map(Topic::getName).anyMatch(topicsNames::contains));
@@ -51,6 +48,9 @@ public class FileWordProvider implements WordProvider {
 
     @Override
     public List<Topic> findTopics(String language, int upToLevel) {
+        if (topics == null) {
+            loadWords();
+        }
         if (upToLevel > 2) {
             return new ArrayList<>(topics.values());
         }

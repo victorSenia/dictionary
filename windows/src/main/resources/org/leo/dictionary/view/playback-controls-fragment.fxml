@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.leo.dictionary.controller.PlaybackControlsFragmentController"
+      spacing="10" alignment="CENTER">
+
+    <Label fx:id="stateLabel" text=" " style="-fx-font-size: 18;"/>
+
+    <HBox spacing="10" alignment="CENTER">
+        <Button fx:id="previousButton" text="⏮"/>
+        <Button fx:id="playStopButton" text="▶"/>
+        <Button fx:id="nextButton" text="⏭"/>
+    </HBox>
+</VBox>

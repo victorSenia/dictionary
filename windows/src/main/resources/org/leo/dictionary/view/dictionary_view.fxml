@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.leo.dictionary.controller.DictionaryController"
+            prefWidth="800" prefHeight="500">
+
+    <top>
+        <VBox>
+            <fx:include source="menu-bar.fxml" fx:id="menuBar" />
+            <fx:include source="playback-controls-fragment.fxml" fx:id="playbackControlsFragment"/>
+        </VBox>
+    </top>
+
+    <center>
+        <fx:include source="words-list-fragment.fxml" fx:id="wordsListFragment"/>
+    </center>
+
+    <right>
+        <fx:include source="topics-list-fragment.fxml" fx:id="topicsListFragment"/>
+    </right>
+
+</BorderPane>
+

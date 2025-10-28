@@ -35,7 +35,7 @@ public class WindowsModule {
 
     @Provides
     @Singleton
-    public ConfigurationService provideConfigurationService(ConfigurationReader configurationReader) {
+    public ConfigurationService provideConfigurationService(FileConfigurationReader configurationReader) {
         ConfigurationService configurationService = new ConfigurationService();
         configurationService.setConfigurationReader(configurationReader);
         return configurationService;
@@ -43,7 +43,7 @@ public class WindowsModule {
 
     @Provides
     @Singleton
-    public ConfigurationReader provideConfigurationReader() {
+    public FileConfigurationReader provideConfigurationReader() {
         FileConfigurationReader fileConfigurationReader = new FileConfigurationReader();
         fileConfigurationReader.setPath("app.properties");
         return fileConfigurationReader;
@@ -91,16 +91,7 @@ public class WindowsModule {
 
     @Provides
     @Singleton
-    public WindowsApp provideWindowsApp(PlayServiceImpl playService, WordProvider wordProvider) {
-        WindowsApp windowsApp = new WindowsApp();
-        windowsApp.setPlayService(playService);
-        windowsApp.setExternalWordProvider(wordProvider);
-        return windowsApp;
-    }
-
-    @Provides
-    @Singleton
-    public PlayServiceImpl providePlayService(ConfigurationService configurationService, AudioService audioService, WordProvider wordProvider) {
+    public PlayService providePlayService(ConfigurationService configurationService, AudioService audioService, WordProvider wordProvider) {
         PlayServiceImpl playService = new PlayServiceImpl();
         playService.setConfigurationService(configurationService);
         playService.setAudioService(audioService);

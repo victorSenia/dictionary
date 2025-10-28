@@ -2,6 +2,7 @@ package org.leo.dictionary;
 
 import org.leo.dictionary.audio.AudioService;
 import org.leo.dictionary.config.ConfigurationService;
+import org.leo.dictionary.config.entity.Configuration;
 import org.leo.dictionary.entity.Translation;
 import org.leo.dictionary.entity.Word;
 import org.leo.dictionary.word.provider.WordProvider;
@@ -23,7 +24,6 @@ public class PlayServiceImpl implements PlayService {
     private WordProvider wordProvider;
     private ListIterator<Word> wordsIterator;
     private List<Word> words;
-    //    private List<Word> knownWords;//TODO not used
     private PlayThread playThread;
     private Set<String> playTranslationFor;
 
@@ -176,37 +176,53 @@ public class PlayServiceImpl implements PlayService {
 
     private void playWord(Word word) throws InterruptedException {
         updateUiState(word);
-        delay(configurationService.getConfiguration().getGeneral().getDelayBefore());
+        delay(getConfiguration().getGeneral().getDelayBefore());
         playWordAudio(word);
         spell(word);
-        translation(chooseTranslation(word, 0));
-        if (configurationService.getConfiguration().getRepeat().getTimes() > 1) {
-            for (int i = 1; i < configurationService.getConfiguration().getRepeat().getTimes(); i++) {
-                delay(configurationService.getConfiguration().getRepeat().getDelay());
+        playTranslation(word, 0);
+        if (getConfiguration().getRepeat().getTimes() > 1) {
+            for (int i = 1; i < getConfiguration().getRepeat().getTimes(); i++) {
+                delay(getConfiguration().getRepeat().getDelay());
                 playWordAudio(word);
-                if (configurationService.getConfiguration().getSpelling().isEachTime()) {
+                if (getConfiguration().getSpelling().isEachTime()) {
                     spell(word);
                 }
-                if (configurationService.getConfiguration().getTranslation().isEachTime()) {
-                    translation(chooseTranslation(word, i));
+                if (getConfiguration().getTranslation().isEachTime()) {
+                    playTranslation(word, i);
                 }
             }
         }
         updateWord(word);
     }
 
+    private void playTranslation(Word word, int translation) throws InterruptedException {
+        if (getConfiguration().getTranslation().isActive()) {
+            if (getConfiguration().getTranslation().isAllTranslations()) {
+                for (Translation t : getTranslations(word)) {
+                    playTranslation(t);
+                }
+            } else {
+                playTranslation(chooseTranslation(word, translation));
+            }
+        }
+    }
+
+    private Configuration getConfiguration() {
+        return configurationService.getConfiguration();
+    }
+
     private void updateWord(Word word) {
-        word.increaseKnowledge(configurationService.getConfiguration().getGeneral().getKnowledgeIncrease());
+        word.increaseKnowledge(getConfiguration().getGeneral().getKnowledgeIncrease());
         wordProvider.updateWord(word);
     }
 
     private void playWordAudio(Word word) throws InterruptedException {
         String fullWord = word.getWord();
-        if (configurationService.getConfiguration().getGeneral().isIncludeArticle()) {
+        if (getConfiguration().getGeneral().isIncludeArticle()) {
             fullWord = word.getFullWord();
         }
         playAudio(word.getLanguage(), fullWord);
-        delay(configurationService.getConfiguration().getGeneral().getDelayPerLetterAfter() * fullWord.length());
+        delay(getConfiguration().getGeneral().getDelayPerLetterAfter() * fullWord.length());
     }
 
     private void updateUiState(Word word) {
@@ -222,12 +238,7 @@ public class PlayServiceImpl implements PlayService {
     private Translation chooseTranslation(Word word, int translation) {
         //TODO choose random
         //TODO fix no translation present
-        List<Translation> wordTranslations = word.getTranslations();
-        if (playTranslationFor != null && !playTranslationFor.isEmpty()) {
-            wordTranslations = word.getTranslations().stream()
-                    .filter(t -> playTranslationFor.contains(t.getLanguage()))
-                    .collect(Collectors.toList());
-        }
+        List<Translation> wordTranslations = getTranslations(word);
         if (translation < wordTranslations.size()) {
             return wordTranslations.get(translation);
         } else {
@@ -235,18 +246,26 @@ public class PlayServiceImpl implements PlayService {
         }
     }
 
-    private void translation(Translation translation) throws InterruptedException {
-        if (configurationService.getConfiguration().getTranslation().isActive()) {
-            delay(configurationService.getConfiguration().getTranslation().getDelay());
-            playAudio(translation.getLanguage(), translation.getTranslation());
+    private List<Translation> getTranslations(Word word) {
+        List<Translation> wordTranslations = word.getTranslations();
+        if (playTranslationFor != null && !playTranslationFor.isEmpty()) {
+            wordTranslations = word.getTranslations().stream()
+                    .filter(t -> playTranslationFor.contains(t.getLanguage()))
+                    .collect(Collectors.toList());
         }
+        return wordTranslations;
+    }
+
+    private void playTranslation(Translation translation) throws InterruptedException {
+        delay(getConfiguration().getTranslation().getDelay());
+        playAudio(translation.getLanguage(), translation.getTranslation());
     }
 
     private void spell(Word word) throws InterruptedException {
-        if (configurationService.getConfiguration().getSpelling().isActive()) {
-            delay(configurationService.getConfiguration().getSpelling().getDelay() - configurationService.getConfiguration().getSpelling().getLetterDelay());//TODO skip first delay
+        if (getConfiguration().getSpelling().isActive()) {
+            delay(getConfiguration().getSpelling().getDelay() - getConfiguration().getSpelling().getLetterDelay());//TODO skip first delay
             for (String letter : word.getWord().split("")) {
-                delay(configurationService.getConfiguration().getSpelling().getLetterDelay());
+                delay(getConfiguration().getSpelling().getLetterDelay());
                 playAudio(word.getLanguage(), letter.toUpperCase(Locale.forLanguageTag(word.getLanguage().substring(0, 2))));
             }
         }

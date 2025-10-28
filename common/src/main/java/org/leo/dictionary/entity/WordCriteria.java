@@ -8,7 +8,6 @@ import java.util.Set;
 public class WordCriteria implements Serializable {
     private Double knowledgeFrom;
     private Double knowledgeTo;
-    private Set<String> topicsAnd;
     private Set<Topic> topicsOr;
     private Set<Topic> rootTopics;
     private String languageFrom;
@@ -40,18 +39,6 @@ public class WordCriteria implements Serializable {
 
     public void setKnowledgeTo(Double knowledgeTo) {
         this.knowledgeTo = knowledgeTo;
-    }
-
-    public Set<String> getTopicsAnd() {
-        return topicsAnd;
-    }
-
-    public void setTopicsAnd(List<String> topicsAnd) {
-        this.topicsAnd = new HashSet<>(topicsAnd);
-    }
-
-    public void setTopicsAnd(Set<String> topicsAnd) {
-        this.topicsAnd = topicsAnd;
     }
 
     public Set<Topic> getTopicsOr() {
