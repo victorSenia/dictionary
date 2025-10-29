@@ -5,8 +5,10 @@ import javafx.util.Callback;
 import org.leo.dictionary.audio.AudioService;
 import org.leo.dictionary.config.ConfigurationService;
 import org.leo.dictionary.config.FileConfigurationReader;
+import org.leo.dictionary.word.provider.DBWordProvider;
 import org.leo.dictionary.word.provider.WordProvider;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 @Singleton
@@ -23,13 +25,7 @@ interface WindowsAppComponent {
 
     FileConfigurationReader configurationReader();
     Callback<Class<?>, Object> controllerFactory();
-//
-//    AudioService externalVoiceService();
-//
-//    UiUpdater uiUpdater();
-//
-//
-//    GrammarProvider externalGrammarProvider();
-//
-//    SentenceProvider externalSentenceProvider();
+
+    @Named("dbWordProvider")
+    DBWordProvider dbWordProvider();
 }

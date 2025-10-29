@@ -18,7 +18,7 @@ public class PlaybackControlsFragmentController {
     @FXML
     private Label stateLabel;
 
-    private PlayService playService;
+    private final PlayService playService;
 
     public PlaybackControlsFragmentController(PlayService playService) {
         this.playService = playService;

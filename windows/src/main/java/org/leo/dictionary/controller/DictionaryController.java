@@ -16,8 +16,8 @@ public class DictionaryController {
     private TopicsListFragmentController topicsListFragmentController;
     @FXML
     private WordsListFragmentController wordsListFragmentController;
-    private PlayService playService;
-    private ExternalWordProvider wordProvider;
+    private final PlayService playService;
+    private final ExternalWordProvider wordProvider;
 
     public DictionaryController(PlayService playService, ExternalWordProvider wordProvider) {
         this.playService = playService;

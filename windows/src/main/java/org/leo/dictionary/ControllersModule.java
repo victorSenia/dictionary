@@ -6,8 +6,10 @@ import javafx.util.Callback;
 import org.leo.dictionary.config.ConfigurationService;
 import org.leo.dictionary.config.FileConfigurationReader;
 import org.leo.dictionary.controller.*;
+import org.leo.dictionary.word.provider.DBWordProvider;
 import org.leo.dictionary.word.provider.WordProvider;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
 @Module
@@ -43,7 +45,9 @@ public class ControllersModule {
     }
 
     @Provides
-    MenuBarController provideMenuBarController(Callback<Class<?>, Object> controllerFactory) {
-        return new MenuBarController(controllerFactory);
+    MenuBarController provideMenuBarController(Callback<Class<?>, Object> controllerFactory,
+                                               WordProvider wordProvider,
+                                               @Named("dbWordProvider") DBWordProvider dbWordProvider) {
+        return new MenuBarController(controllerFactory,wordProvider, dbWordProvider);
     }
 }

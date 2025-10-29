@@ -74,7 +74,7 @@ public class Sentence {
         }
 
         public void join(StringBuilder builder) {
-            if (builder.length() != 0) {
+            if (!builder.isEmpty()) {
                 builder.append(' ');
             }
             builder.append(part);

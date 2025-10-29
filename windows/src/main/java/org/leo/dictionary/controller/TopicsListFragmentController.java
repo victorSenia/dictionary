@@ -5,8 +5,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import org.leo.dictionary.ExternalWordProvider;
 import org.leo.dictionary.entity.Topic;
+import org.leo.dictionary.word.provider.WordProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +17,9 @@ public class TopicsListFragmentController {
     @FXML
     private ListView<Topic> topicsList;
 
-    private ExternalWordProvider wordProvider;
+    private final WordProvider wordProvider;
     private Consumer<List<Topic>> onTopicsSelected;
-    public TopicsListFragmentController(ExternalWordProvider wordProvider) {
+    public TopicsListFragmentController(WordProvider wordProvider) {
         this.wordProvider = wordProvider;}
 
     public void init(Consumer<List<Topic>> onTopicsSelected) {
@@ -32,8 +32,8 @@ public class TopicsListFragmentController {
                 setText(empty || item == null ? "" : item.getName());
             }
         });
-
-        topicsList.setItems(FXCollections.observableList(wordProvider.findTopics("de", 2)));
+//TODO correct language
+        topicsList.setItems(FXCollections.observableList(wordProvider.findTopics("de_DE", 2)));
         topicsList.getSelectionModel().setSelectionMode(javafx.scene.control.SelectionMode.MULTIPLE);
         addContextMenu();
     }

@@ -14,7 +14,7 @@ public class WordsListFragmentController {
 
     @FXML
     private ListView<Word> wordList;
-    private PlayService playService;
+    private final PlayService playService;
 
     public WordsListFragmentController(PlayService playService) {
         this.playService = playService;

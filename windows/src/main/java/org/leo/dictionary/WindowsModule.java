@@ -5,19 +5,28 @@ import dagger.Provides;
 import org.leo.dictionary.audio.AudioService;
 import org.leo.dictionary.audio.WindowsAudioService;
 import org.leo.dictionary.config.ConfigParser;
-import org.leo.dictionary.config.ConfigurationReader;
 import org.leo.dictionary.config.ConfigurationService;
 import org.leo.dictionary.config.FileConfigurationReader;
 import org.leo.dictionary.config.entity.ParseWords;
+import org.leo.dictionary.db.DatabaseHelper;
+import org.leo.dictionary.db.DatabaseManager;
+import org.leo.dictionary.word.provider.DBWordProvider;
 import org.leo.dictionary.word.provider.FileWordProvider;
 import org.leo.dictionary.word.provider.WordProvider;
+import org.leo.dictionary.word.provider.WordProviderDelegate;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import static org.leo.dictionary.db.DatabaseHelper.DB_URL;
 
 @Module
 public class WindowsModule {
@@ -51,7 +60,20 @@ public class WindowsModule {
 
     @Provides
     @Singleton
-    public WordProvider provideWordProvider(ParseWords configuration) {
+    public WordProvider provideWordProvider(FileWordProvider fileWordProvider, @Named("dbWordProvider") DBWordProvider dbWordProvider) {
+        WordProviderDelegate wordProvider = new WordProviderDelegate();
+        wordProvider.setWordProvider(dbWordProvider);
+//        wordProvider.setWordProvider(fileWordProvider);
+        return wordProvider;
+    }
+
+    @Provides
+    @Singleton
+    public FileWordProvider provideFileWordProvider(ParseWords configuration) {
+        return createFileWordProvider(configuration);
+    }
+
+    public static FileWordProvider createFileWordProvider(ParseWords configuration) {
         FileWordProvider fileWordProvider = new FileWordProvider();
         fileWordProvider.setConfiguration(configuration);
         return fileWordProvider;
@@ -74,7 +96,7 @@ public class WindowsModule {
         }
     }
 
-    public ParseWords getDefaultParseWordsConfig() {
+    public static ParseWords getDefaultParseWordsConfig() {
         ParseWords config = new ParseWords();
         config.setProperties(new Properties());
         config.setDelimiter("\\|");
@@ -98,4 +120,36 @@ public class WindowsModule {
         playService.setWordProvider(wordProvider);
         return playService;
     }
+
+    @Provides
+    @Singleton
+    public DatabaseHelper provideDatabaseHelper() {
+        return new DatabaseHelper();
+    }
+
+    @Provides
+    @Singleton
+    public Connection provideConnection() {
+        try {
+            return DriverManager.getConnection(DB_URL);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Provides
+    @Singleton
+    public DatabaseManager provideDatabaseManager(DatabaseHelper databaseHelper, Connection connection) {
+        return new DatabaseManager(databaseHelper, connection);
+    }
+
+    @Provides
+    @Singleton
+    @Named("dbWordProvider")
+    public DBWordProvider provideDBWordProvider(DatabaseManager databaseManager) {
+        DBWordProvider dbWordProvider = new DBWordProvider();
+        dbWordProvider.setDbManager(databaseManager);
+        return dbWordProvider;
+    }
+
 }
