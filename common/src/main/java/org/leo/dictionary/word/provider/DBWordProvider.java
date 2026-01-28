@@ -123,7 +123,7 @@ public class DBWordProvider implements WordProvider {
         for (Topic topic : updatedWord.getTopics()) {
             if (topic.getId() == 0) {
                 databaseManager.insertWordTopicLink(updatedWord.getId(), databaseManager.insertTopic(topic));
-            } else if (findTranslationById(oldWord, topic.getId()) == null) {
+            } else if (findTopicById(oldWord, topic.getId()) == null) {
                 databaseManager.insertWordTopicLink(updatedWord.getId(), topic.getId());
             }
         }

@@ -97,6 +97,10 @@ public class PlayServiceImpl implements PlayService {
     public boolean isPlaying() {
         return playThread != null && !playThread.isInterrupted();
     }
+    @Override
+    public boolean isReady() {
+        return words != null;
+    }
 
     private void createIteratorFrom(int index) {
         synchronized (playLock) {

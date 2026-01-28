@@ -18,6 +18,8 @@ public interface PlayService {
 
     boolean isPlaying();
 
+    boolean isReady();
+
     void previous();
 
     void setUiUpdater(UiUpdater uiUpdater);
