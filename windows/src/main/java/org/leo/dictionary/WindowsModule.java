@@ -76,6 +76,7 @@ public class WindowsModule {
     public static FileWordProvider createFileWordProvider(ParseWords configuration) {
         FileWordProvider fileWordProvider = new FileWordProvider();
         fileWordProvider.setConfiguration(configuration);
+        fileWordProvider.parseAndUpdateConfiguration();
         return fileWordProvider;
     }
 

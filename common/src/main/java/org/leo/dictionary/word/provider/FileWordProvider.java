@@ -16,6 +16,8 @@ import java.util.stream.Stream;
 public class FileWordProvider implements WordProvider {
     private final static Logger LOGGER = Logger.getLogger(FileWordProvider.class.getName());
 
+    public static final String PARSE_WORDS_CONFIGURATION = "org.leo.dictionary.config.entity.ParseWords";
+
     protected ParseWords configuration;
     protected Map<String, Topic> topics;
     protected Topic rootTopic;
@@ -119,7 +121,7 @@ public class FileWordProvider implements WordProvider {
     }
 
     protected boolean isIgnoredLine(String line) {
-        return line == null || line.isEmpty();
+        return line == null || line.isEmpty() || isConfigurationLine(line);
     }
 
     private <V> void addIfNotPresent(List<V> list, List<V> addList) {
@@ -288,6 +290,78 @@ public class FileWordProvider implements WordProvider {
         return stringBuilder.toString();
     }
 
+    public static boolean isConfigurationLine(String line) {
+        return line.startsWith(PARSE_WORDS_CONFIGURATION);
+    }
+
+    public static String decode(String string) {
+        if (string == null || string.isEmpty()) {
+            return null;
+        }
+        return WordImporter.decode(string);
+    }
+
+    public static List<String> parseListProperty(String configPart) {
+        if (configPart.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(configPart.split(WordExporter.PARTS_DIVIDER)).map(FileWordProvider::decode).collect(Collectors.toList());
+    }
+
+    public static String encode(String string) {
+        if (string == null || string.isEmpty()) {
+            return "";
+        }
+        return WordExporter.encode(string);
+    }
+
+    public static String listPropertyToString(List<String> strings) {
+        if (strings == null || strings.isEmpty()) {
+            return "";
+        }
+        return strings.stream().map(FileWordProvider::encode).collect(Collectors.joining(WordExporter.PARTS_DIVIDER));
+    }
+
+    public void parseAndUpdateConfiguration() {
+        try (BufferedReader fileReader = getBufferedReader()) {
+            String line;
+            while ((line = fileReader.readLine()) != null) {
+                if (isConfigurationLine(line)) {
+                    String[] configParts = line.split(WordExporter.MAIN_DIVIDER, -1);
+                    if (configParts.length < 10) {
+                        throw new IllegalArgumentException("config incorrect " + line);
+                    }
+                    configuration.setLanguageFrom(decode(configParts[1]));
+                    configuration.setLanguagesTo(parseListProperty(configParts[2]));
+                    configuration.setArticles(parseListProperty(configParts[3]));
+                    configuration.setDelimiter(decode(configParts[4]));
+                    configuration.setAdditionalInformationDelimiter(decode(configParts[5]));
+                    configuration.setTranslationDelimiter(decode(configParts[6]));
+                    configuration.setTopicFlag(decode(configParts[7]));
+                    configuration.setTopicDelimiter(decode(configParts[8]));
+                    configuration.setRootTopic(decode(configParts[9]));
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String configurationToLine() {
+        return String.join(WordExporter.MAIN_DIVIDER, new String[]{
+                PARSE_WORDS_CONFIGURATION,
+                encode(configuration.getLanguageFrom()),
+                listPropertyToString(configuration.getLanguagesTo()),
+                listPropertyToString(configuration.getArticles()),
+                encode(configuration.getDelimiter()),
+                encode(configuration.getAdditionalInformationDelimiter()),
+                encode(configuration.getTranslationDelimiter()),
+                encode(configuration.getTopicFlag()),
+                encode(configuration.getTopicDelimiter()),
+                encode(configuration.getRootTopic())
+        });
+    }
     @Override
     public List<Word> findKnownWords() {
         return new ArrayList<>();
