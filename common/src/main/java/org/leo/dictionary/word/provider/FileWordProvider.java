@@ -45,7 +45,26 @@ public class FileWordProvider implements WordProvider {
             double expectedKnowledge = wordCriteria.getKnowledgeTo();
             stream = stream.filter(word -> word.getKnowledge() < expectedKnowledge);
         }
-        return stream.collect(Collectors.toList());
+        WordCriteria.WordsOrderMode mode = wordCriteria.getWordsOrderMode();
+        if (mode == null) {
+            mode = wordCriteria.getShuffleRandom() != WordCriteria.NOT_SET
+                    ? WordCriteria.WordsOrderMode.SHUFFLE
+                    : WordCriteria.WordsOrderMode.IMPORT_ORDER;
+        }
+        if (mode == WordCriteria.WordsOrderMode.SORTED) {
+            stream = stream.sorted(
+                    Comparator.comparing(Word::getLanguage, String.CASE_INSENSITIVE_ORDER)
+                            .thenComparing(Word::getWord, String.CASE_INSENSITIVE_ORDER)
+            );
+        }
+        List<Word> result = stream.collect(Collectors.toList());
+        if (mode == WordCriteria.WordsOrderMode.SHUFFLE) {
+            long seed = wordCriteria.getShuffleRandom() == WordCriteria.NOT_SET
+                    ? System.currentTimeMillis()
+                    : wordCriteria.getShuffleRandom();
+            Collections.shuffle(result, new Random(seed));
+        }
+        return result;
     }
 
     @Override

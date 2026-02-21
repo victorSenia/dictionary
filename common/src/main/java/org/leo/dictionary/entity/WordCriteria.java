@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 public class WordCriteria implements Serializable {
+    public static long NOT_SET = -1;
     private Double knowledgeFrom;
     private Double knowledgeTo;
     private Set<Topic> topicsOr;
@@ -15,7 +16,8 @@ public class WordCriteria implements Serializable {
     private Set<String> playTranslationFor;
     private boolean noRootTopic;
     private boolean noTopic;
-    private long shuffleRandom = -1;
+    private long shuffleRandom = NOT_SET;
+    private WordsOrderMode wordsOrderMode = WordCriteria.WordsOrderMode.SORTED;
 
     public Double getKnowledgeFrom() {
         return knowledgeFrom;
@@ -110,5 +112,20 @@ public class WordCriteria implements Serializable {
 
     public void setShuffleRandom(long shuffleRandom) {
         this.shuffleRandom = shuffleRandom;
+    }
+
+    public WordsOrderMode getWordsOrderMode() {
+        return wordsOrderMode;
+    }
+
+    public void setWordsOrderMode(WordsOrderMode wordsOrderMode) {
+        this.wordsOrderMode = wordsOrderMode;
+    }
+
+    public enum WordsOrderMode {
+        IMPORT_ORDER,
+        SORTED,
+        SHUFFLE
+
     }
 }

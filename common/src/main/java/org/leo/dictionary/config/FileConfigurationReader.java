@@ -37,9 +37,6 @@ public class FileConfigurationReader implements ConfigurationReader {
     public void writeConfig(Properties properties, String path, String comment) {
         new java.io.File(path).getAbsoluteFile().getParentFile().mkdirs();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
-//            for (String key : properties.keySet().stream().map(Object::toString).sorted().toList()) {
-//                writer.write(key + "=" + properties.get(key) + "\r\n");
-//            }
             properties.store(writer, comment);
         } catch (IOException e) {
             throw new RuntimeException(e);

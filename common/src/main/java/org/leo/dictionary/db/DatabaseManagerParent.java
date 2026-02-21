@@ -215,7 +215,24 @@ public abstract class DatabaseManagerParent<T extends AutoCloseable> {
             where += " AND w." + DatabaseConstants.WORD_COLUMN_KNOWLEDGE + " <= ?";
             selectionArgs.add(criteria.getKnowledgeTo().toString());
         }
-        String orderBy = criteria.getShuffleRandom() != -1 ? "w." + DatabaseConstants.COLUMN_ID : "w." + DatabaseConstants.COLUMN_LANGUAGE + ", w." + DatabaseConstants.WORD_COLUMN_WORD + " COLLATE NOCASE";
+        WordCriteria.WordsOrderMode mode = criteria.getWordsOrderMode();
+        if (mode == null) {
+            mode = criteria.getShuffleRandom() != -1
+                    ? WordCriteria.WordsOrderMode.SHUFFLE
+                    : WordCriteria.WordsOrderMode.SORTED;
+        }
+        String orderBy;
+        switch (mode) {
+            case IMPORT_ORDER:
+            case SHUFFLE:
+                orderBy = "w." + DatabaseConstants.COLUMN_ID;
+                break;
+            case SORTED:
+            default:
+                orderBy = "w." + DatabaseConstants.COLUMN_LANGUAGE
+                        + ", w." + DatabaseConstants.WORD_COLUMN_WORD + " COLLATE NOCASE";
+                break;
+        }
         String fullSql = sql + where + (countOnly ? "" : " ORDER BY " + orderBy);
 
         return rawQuery(fullSql, selectionArgs.toArray(new String[0]));
