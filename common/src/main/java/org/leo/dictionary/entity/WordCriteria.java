@@ -17,7 +17,7 @@ public class WordCriteria implements Serializable {
     private boolean noRootTopic;
     private boolean noTopic;
     private long shuffleRandom = NOT_SET;
-    private WordsOrderMode wordsOrderMode = WordCriteria.WordsOrderMode.SORTED;
+    private WordsOrderMode wordsOrderMode = WordsOrderMode.IMPORT_ORDER;
 
     public Double getKnowledgeFrom() {
         return knowledgeFrom;
