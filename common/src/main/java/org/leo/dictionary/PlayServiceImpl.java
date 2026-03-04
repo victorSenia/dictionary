@@ -97,6 +97,7 @@ public class PlayServiceImpl implements PlayService {
     public boolean isPlaying() {
         return playThread != null && !playThread.isInterrupted();
     }
+
     @Override
     public boolean isReady() {
         return words != null;
@@ -201,12 +202,15 @@ public class PlayServiceImpl implements PlayService {
 
     private void playTranslation(Word word, int translation) throws InterruptedException {
         if (getConfiguration().getTranslation().isActive()) {
-            if (getConfiguration().getTranslation().isAllTranslations()) {
-                for (Translation t : getTranslations(word)) {
-                    playTranslation(t);
+            List<Translation> translations = getTranslations(word);
+            if (translations != null && !translations.isEmpty()) {
+                if (getConfiguration().getTranslation().isAllTranslations()) {
+                    for (Translation t : translations) {
+                        playTranslation(t);
+                    }
+                } else {
+                    playTranslation(chooseTranslation(translations, translation));
                 }
-            } else {
-                playTranslation(chooseTranslation(word, translation));
             }
         }
     }
@@ -239,10 +243,9 @@ public class PlayServiceImpl implements PlayService {
         audioService.play(language, word);
     }
 
-    private Translation chooseTranslation(Word word, int translation) {
+    private Translation chooseTranslation(List<Translation> wordTranslations, int translation) {
         //TODO choose random
         //TODO fix no translation present
-        List<Translation> wordTranslations = getTranslations(word);
         if (translation < wordTranslations.size()) {
             return wordTranslations.get(translation);
         } else {
@@ -252,7 +255,7 @@ public class PlayServiceImpl implements PlayService {
 
     private List<Translation> getTranslations(Word word) {
         List<Translation> wordTranslations = word.getTranslations();
-        if (playTranslationFor != null && !playTranslationFor.isEmpty()) {
+        if (playTranslationFor != null && !playTranslationFor.isEmpty() && wordTranslations != null && wordTranslations.isEmpty()) {
             wordTranslations = word.getTranslations().stream()
                     .filter(t -> playTranslationFor.contains(t.getLanguage()))
                     .collect(Collectors.toList());

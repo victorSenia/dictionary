@@ -422,7 +422,7 @@ public abstract class DatabaseManagerParent<T extends AutoCloseable> {
                 throw new RuntimeException(e);
             }
         }
-        words = words.stream().filter(this::hasTranslations).collect(Collectors.toList());
+//        words = words.stream().filter(this::hasTranslations).collect(Collectors.toList());
         if (includeTopics && !words.isEmpty()) {
             Map<Long, Topic> topics = new HashMap<>(getTopics(null, null, "1").stream().collect(Collectors.toMap(Topic::getId, Function.identity())));
             for (Word word : words) {

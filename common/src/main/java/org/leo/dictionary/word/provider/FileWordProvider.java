@@ -322,7 +322,7 @@ public class FileWordProvider implements WordProvider {
 
     public static List<String> parseListProperty(String configPart) {
         if (configPart.trim().isEmpty()) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return Arrays.stream(configPart.split(WordExporter.PARTS_DIVIDER)).map(FileWordProvider::decode).collect(Collectors.toList());
     }
