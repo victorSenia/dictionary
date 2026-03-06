@@ -35,7 +35,7 @@ public class FileWordProvider implements WordProvider {
         Stream<Word> stream = words.stream();
         if (wordCriteria.getTopicsOr() != null && !wordCriteria.getTopicsOr().isEmpty()) {
             Set<String> topicsNames = wordCriteria.getTopicsOr().stream().map(Topic::getName).collect(Collectors.toSet());
-            stream = stream.filter(word -> word.getTopics().stream().map(Topic::getName).anyMatch(topicsNames::contains));
+            stream = stream.filter(word -> word.getTopics() != null && word.getTopics().stream().map(Topic::getName).anyMatch(topicsNames::contains));
         }
         if (wordCriteria.getKnowledgeFrom() != null) {
             double expectedKnowledge = wordCriteria.getKnowledgeFrom();
@@ -164,12 +164,10 @@ public class FileWordProvider implements WordProvider {
             newTopics = new ArrayList<>();
         } else {
             newTopics = new ArrayList<>(topics);
-            Topic lastTopic = newTopics.get(newTopics.size() - 1);
-            while (lastTopic.getLevel() >= topic.getLevel()) {
+            while (!newTopics.isEmpty() && newTopics.get(newTopics.size() - 1).getLevel() >= topic.getLevel()) {
                 newTopics.remove(newTopics.size() - 1);
-                lastTopic = newTopics.get(newTopics.size() - 1);
             }
-            if (lastTopic.getLevel() + 1 != topic.getLevel()) {
+            if (!newTopics.isEmpty() && newTopics.get(newTopics.size() - 1).getLevel() + 1 != topic.getLevel()) {
                 LOGGER.severe("Wrong topics levels for topic=" + topic);
             }
         }

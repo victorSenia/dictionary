@@ -8,6 +8,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -47,6 +48,12 @@ public abstract class WordExporter {
     }
 
     public void writeWords(List<Word> list, boolean allForLanguage, List<String> rootTopicNames) throws IOException {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+        if (rootTopicNames == null) {
+            rootTopicNames = Collections.emptyList();
+        }
         try (BufferedWriter writer = getBufferedWriter()) {
             this.writer = writer;
             if (allForLanguage) {
@@ -111,6 +118,9 @@ public abstract class WordExporter {
     }
 
     private void writeTopics(List<Topic> topics) throws IOException {
+        if (topics == null || topics.isEmpty()) {
+            return;
+        }
         for (Topic topic : topics) {
             if (isRelevantForTopic(topic)) {
                 writeTopic(topic);
@@ -131,6 +141,9 @@ public abstract class WordExporter {
     }
 
     private void writeTranslations(List<Translation> translations) throws IOException {
+        if (translations == null || translations.isEmpty()) {
+            return;
+        }
         for (Translation translation : translations) {
             writeTranslation(translation);
             writer.write(PARTS_DIVIDER);

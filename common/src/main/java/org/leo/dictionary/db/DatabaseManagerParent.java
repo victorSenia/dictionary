@@ -255,7 +255,7 @@ public abstract class DatabaseManagerParent<T extends AutoCloseable> {
 
         return query(false, DatabaseConstants.TABLE_NAME_TRANSLATION,
                 columns, selection,
-                selectionArgs.toArray(selectionArgs.toArray(new String[0])),
+                selectionArgs.toArray(new String[0]),
                 DatabaseConstants.TRANSLATION_COLUMN_WORD_ID, null);
     }
 
@@ -298,7 +298,7 @@ public abstract class DatabaseManagerParent<T extends AutoCloseable> {
 
         return query(false, DatabaseConstants.TABLE_NAME_TOPIC,
                 columns, selection,
-                selectionArgs.toArray(selectionArgs.toArray(new String[0])),
+                selectionArgs.toArray(new String[0]),
                 null, null);
     }
 
@@ -507,7 +507,11 @@ public abstract class DatabaseManagerParent<T extends AutoCloseable> {
                 null, null)) {
             int dataIndex = findColumn(res, DatabaseConstants.CONFIGURATION_PRESET_DATA);
             if (moveToNext(res)) {
-                return (Map<String, ?>) SerializeUtils.deserializeBytes(getBlob(res, dataIndex));
+                Object data = SerializeUtils.deserializeBytes(getBlob(res, dataIndex));
+                if (data instanceof Map) {
+                    return (Map<String, ?>) data;
+                }
+                return null;
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

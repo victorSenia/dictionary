@@ -95,7 +95,7 @@ public class PlayServiceImpl implements PlayService {
 
     @Override
     public boolean isPlaying() {
-        return playThread != null && !playThread.isInterrupted();
+        return playThread != null && playThread.isAlive() && !playThread.isInterrupted();
     }
 
     @Override
@@ -255,8 +255,8 @@ public class PlayServiceImpl implements PlayService {
 
     private List<Translation> getTranslations(Word word) {
         List<Translation> wordTranslations = word.getTranslations();
-        if (playTranslationFor != null && !playTranslationFor.isEmpty() && wordTranslations != null && wordTranslations.isEmpty()) {
-            wordTranslations = word.getTranslations().stream()
+        if (playTranslationFor != null && !playTranslationFor.isEmpty() && wordTranslations != null && !wordTranslations.isEmpty()) {
+            wordTranslations = wordTranslations.stream()
                     .filter(t -> playTranslationFor.contains(t.getLanguage()))
                     .collect(Collectors.toList());
         }

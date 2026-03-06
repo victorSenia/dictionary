@@ -1,5 +1,6 @@
 package org.leo.dictionary.config;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -44,7 +45,11 @@ public class ConfigParser {
             for (String elementValue : value.split(";")) {
                 values.add(getObject(elementValue, fieldType.getComponentType()));
             }
-            return values.toArray();//TODO wrong type
+            Object array = Array.newInstance(fieldType.getComponentType(), values.size());
+            for (int i = 0; i < values.size(); i++) {
+                Array.set(array, i, values.get(i));
+            }
+            return array;
         } else if (Collection.class.isAssignableFrom(fieldType)) {
             ArrayList<Object> values = new ArrayList<>();
             for (String elementValue : value.split(";")) {
