@@ -11,10 +11,13 @@ public class ConfigParent {
 
         Object v = properties.get(fullKey);
         if (v != null) {
-            if (v.getClass().isAssignableFrom(defaultValue.getClass())) {
+            if (defaultValue != null && defaultValue.getClass().isAssignableFrom(v.getClass())) {
                 return (V) v;
             }
             if (Collection.class.isAssignableFrom(defaultValue.getClass())) {
+                if (v instanceof Collection) {
+                    return (V) v;
+                }
                 String value = v.toString();
                 ArrayList<Object> values = new ArrayList<>();
                 if (!value.isEmpty()) {
