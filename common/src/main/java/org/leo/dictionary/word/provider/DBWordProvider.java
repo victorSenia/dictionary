@@ -32,10 +32,13 @@ public class DBWordProvider implements WordProvider {
         }
         return null;
     }
-
     @Override
-    public List<Word> findWords(WordCriteria wordCriteria) {
-        return databaseManager.getWords(wordCriteria);
+    public List<Word> findWords(WordCriteria criteria) {
+        List<Word> words = databaseManager.getWords(criteria); // get filtered set
+        if (criteria.getWordsOrderMode() == WordCriteria.WordsOrderMode.SHUFFLE) {
+            Collections.shuffle(words, new Random(criteria.getShuffleRandom()));
+        }
+        return words;
     }
 
     @Override

@@ -313,7 +313,7 @@ public class FileWordProvider implements WordProvider {
 
     public static String decode(String string) {
         if (string == null || string.isEmpty()) {
-            return null;
+            return "";
         }
         return WordImporter.decode(string);
     }

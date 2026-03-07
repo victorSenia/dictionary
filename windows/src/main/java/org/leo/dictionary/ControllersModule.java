@@ -19,6 +19,7 @@ public class ControllersModule {
     public Callback<Class<?>, Object> provideControllerFactory(
             PlayService playService, WordProvider wordProvider,
             ConfigurationService configurationService, FileConfigurationReader configurationReader,
+            @Named("dbWordProvider") DBWordProvider dbWordProvider,
             Provider<MenuBarController> menuBarControllerProvider) {
         return (cls) -> {
             if (cls == DictionaryController.class)
@@ -26,11 +27,11 @@ public class ControllersModule {
             if (cls == PlaybackControlsFragmentController.class)
                 return new PlaybackControlsFragmentController(playService);
             if (cls == WordsListFragmentController.class)
-                return new WordsListFragmentController(playService);
+                return new WordsListFragmentController(playService, wordProvider, dbWordProvider);
             if (cls == ConfigWindowController.class)
                 return new ConfigWindowController(configurationService, configurationReader);
-            if (cls == TopicsListFragmentController.class)
-                return new TopicsListFragmentController(wordProvider);
+            if (cls == FilterSidebarFragmentController.class)
+                return new FilterSidebarFragmentController(wordProvider);
             if (cls == MenuBarController.class)
                 return menuBarControllerProvider.get();
 

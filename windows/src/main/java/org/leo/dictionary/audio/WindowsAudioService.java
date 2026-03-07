@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class WindowsAudioService implements AudioService {
-    private final static Logger LOGGER = Logger.getLogger(WindowsAudioService.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(WindowsAudioService.class.getName());
     private Map<String, List<String>> voices;
 
     private Process powerShellProcess = null;
@@ -20,9 +20,9 @@ public class WindowsAudioService implements AudioService {
                 "$speechSynthesizer.GetInstalledVoices().VoiceInfo.Culture.Name;";
     }
 
-    private static String getVoicesCommand(String Culture) {
+    private static String getVoicesCommand(String culture) {
         return "Add-Type -AssemblyName System.Speech; $speechSynthesizer=(New-Object System.Speech.Synthesis.SpeechSynthesizer); " +
-                "$speechSynthesizer.GetInstalledVoices((New-Object CultureInfo('" + Culture + "'))).VoiceInfo.Name;";
+                "$speechSynthesizer.GetInstalledVoices((New-Object System.Globalization.CultureInfo('" + culture + "'))).VoiceInfo.Name;";
     }
 
     public void setup() throws IOException {
@@ -36,10 +36,9 @@ public class WindowsAudioService implements AudioService {
     private List<String> powerShellResult(String powerShellCommand) throws IOException {
         LOGGER.fine(powerShellCommand);
         String command = "powershell.exe \"" + powerShellCommand + "\"";
-// Executing the command
         powerShellProcess = Runtime.getRuntime().exec(command);
-// Getting the results
         powerShellProcess.getOutputStream().close();
+
         String line;
         List<String> result = new ArrayList<>();
         try (BufferedReader stdout = new BufferedReader(new InputStreamReader(powerShellProcess.getInputStream()))) {
@@ -58,18 +57,40 @@ public class WindowsAudioService implements AudioService {
 
     @Override
     public void play(String language, String text) {
-        String command = "Add-Type –AssemblyName System.Speech; " +
+        String selectedVoice = selectVoice(language);
+        String command = "Add-Type -AssemblyName System.Speech; " +
                 "$speechSynthesizer=(New-Object System.Speech.Synthesis.SpeechSynthesizer); " +
-                (voices.containsKey(language) ? "$speechSynthesizer.SelectVoice('" + voices.get(language).get(0) + "'); " : "") +
+                (selectedVoice != null ? "$speechSynthesizer.SelectVoice('" + selectedVoice + "'); " : "") +
                 "$speechSynthesizer.rate=0; " +
                 "$speechSynthesizer.Speak('" + text.replace("'", "''") + "');";
-        try {//TODO language setting
+        try {
             LOGGER.info(language + " " + text);
             powerShellResult(command);
         } catch (IOException e) {
             LOGGER.severe(e.toString());
             throw new RuntimeException(e);
         }
+    }
+
+    private String selectVoice(String language) {
+        if (voices == null || voices.isEmpty() || language == null || language.isBlank()) {
+            return null;
+        }
+        String normalizedLanguage = language.replace('-', '_');
+        List<String> exactVoices = voices.get(normalizedLanguage);
+        if (exactVoices != null && !exactVoices.isEmpty()) {
+            return exactVoices.get(0);
+        }
+
+        String languagePrefix = normalizedLanguage.contains("_")
+                ? normalizedLanguage.substring(0, normalizedLanguage.indexOf('_'))
+                : normalizedLanguage;
+        for (Map.Entry<String, List<String>> entry : voices.entrySet()) {
+            if (entry.getKey().startsWith(languagePrefix + "_") && !entry.getValue().isEmpty()) {
+                return entry.getValue().get(0);
+            }
+        }
+        return null;
     }
 
     @Override

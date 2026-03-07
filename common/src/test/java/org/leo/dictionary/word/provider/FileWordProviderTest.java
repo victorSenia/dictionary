@@ -282,8 +282,8 @@ class FileWordProviderTest {
         assertEquals("", FileWordProvider.listPropertyToString(null));
         assertEquals("", FileWordProvider.listPropertyToString(List.of()));
         assertEquals(List.of(), FileWordProvider.parseListProperty("  "));
-        assertNull(FileWordProvider.decode(""));
-        assertNull(FileWordProvider.decode(null));
+        assertEquals("", FileWordProvider.decode(""));
+        assertEquals("", FileWordProvider.decode(null));
 
         List<String> values = List.of("de", "en:us", "a;b");
         String encoded = FileWordProvider.listPropertyToString(values);

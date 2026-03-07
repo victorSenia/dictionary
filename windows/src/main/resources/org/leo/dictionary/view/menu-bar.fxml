@@ -3,21 +3,27 @@
 <?import javafx.scene.control.*?>
 <MenuBar xmlns:fx="http://javafx.com/fxml" fx:controller="org.leo.dictionary.controller.MenuBarController"
          fx:id="menuBar">
-    <Menu text="File">
-        <MenuItem text="filter words" onAction="#findWords"/>
-        <MenuItem text="parse words" onAction="#parseWords"/>
-
+    <Menu text="Source">
+        <MenuItem text="Parse words from file" onAction="#parseWords"/>
+        <MenuItem fx:id="useDbMenuItem" text="Use database source" onAction="#useDb"/>
+        <SeparatorMenuItem/>
+        <MenuItem text="Import current source to DB" onAction="#importWords"/>
     </Menu>
+
+    <Menu text="Words">
+        <MenuItem text="Set knowledge for filtered words" onAction="#setKnowledge"/>
+    </Menu>
+
+    <Menu text="Database">
+        <MenuItem text="Clean DB by language" onAction="#cleanDb"/>
+    </Menu>
+
+    <Menu text="Transfer">
+        <MenuItem text="Import words from exported file" onAction="#importWordsFromFile"/>
+        <MenuItem text="Export words to file" onAction="#exportWordsToFile"/>
+    </Menu>
+
     <Menu text="Settings">
         <MenuItem text="Configuration" onAction="#openConfigWindow"/>
-        <!-- Add more config sections here -->
-    </Menu>
-    <Menu text="database">
-        <MenuItem text="use_db" onAction="#useDb"/>
-        <MenuItem onAction="#importWords" text="import_words"/>
-        <MenuItem onAction="#cleanDb" text="clean_db"/>
-        <MenuItem onAction="#setKnowledge" text="setKnowledge"/>
-        <MenuItem onAction="#exportWordsToFile" text="export_words_to_file"/>
-        <MenuItem onAction="#importWordsFromFile" text="import_words_from_file"/>
     </Menu>
 </MenuBar>

@@ -106,13 +106,19 @@ public class DatabaseManager extends DatabaseManagerParent<QueryResult> {
                 T result = supplier.get();
                 connection.commit();
                 return result;
-            } catch (SQLException e) {
-                connection.rollback();
+            } catch (Exception e) {
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackException) {
+                    e.addSuppressed(rollbackException);
+                }
                 throw e;
             } finally {
                 connection.setAutoCommit(originalAutoCommit);
             }
-        } catch (SQLException e) {
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -341,8 +347,28 @@ public class DatabaseManager extends DatabaseManagerParent<QueryResult> {
                 throw new RuntimeException(e);
             }
         }
+        deleteUnusedTopicsAndRoots();
 
         return wordIds.size();
+    }
+
+    private void deleteUnusedTopicsAndRoots() {
+        String sql = "DELETE FROM " + DatabaseConstants.TABLE_NAME_TOPIC +
+                " WHERE NOT EXISTS (" +
+                "SELECT 1 FROM " + DatabaseConstants.TABLE_NAME_WORD_TOPIC + " wt" +
+                " WHERE wt." + DatabaseConstants.COLUMN_ID + " = " + DatabaseConstants.TABLE_NAME_TOPIC + "." + DatabaseConstants.COLUMN_ID +
+                ") AND NOT EXISTS (" +
+                "SELECT 1 FROM " + DatabaseConstants.TABLE_NAME_TOPIC + " child" +
+                " WHERE child." + DatabaseConstants.TOPIC_COLUMN_ROOT_ID + " = " + DatabaseConstants.TABLE_NAME_TOPIC + "." + DatabaseConstants.COLUMN_ID +
+                ")";
+
+        try (Statement stmt = getConnection().createStatement()) {
+            while (stmt.executeUpdate(sql) > 0) {
+                // Keep deleting until no dangling children/roots remain.
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public int updateWord(Word word) {

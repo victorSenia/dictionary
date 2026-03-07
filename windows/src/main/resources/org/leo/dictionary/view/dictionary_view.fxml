@@ -18,7 +18,7 @@
     </center>
 
     <right>
-        <fx:include source="topics-list-fragment.fxml" fx:id="topicsListFragment"/>
+        <fx:include source="filter-sidebar-fragment.fxml" fx:id="filterSidebarFragment"/>
     </right>
 
 </BorderPane>
