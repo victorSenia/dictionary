@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,7 @@ public class PlayServiceImpl implements PlayService {
     private List<Word> words;
     private PlayThread playThread;
     private Set<String> playTranslationFor;
+    private Consumer<Long> delayProvider;
 
     @Override
     public void play() {
@@ -200,7 +202,7 @@ public class PlayServiceImpl implements PlayService {
         updateWord(word);
     }
 
-    private void playTranslation(Word word, int translation) throws InterruptedException {
+    private void playTranslation(Word word, int translation) {
         if (getConfiguration().getTranslation().isActive()) {
             List<Translation> translations = getTranslations(word);
             if (translations != null && !translations.isEmpty()) {
@@ -224,7 +226,7 @@ public class PlayServiceImpl implements PlayService {
         wordProvider.updateWord(word);
     }
 
-    private void playWordAudio(Word word) throws InterruptedException {
+    private void playWordAudio(Word word) {
         String fullWord = word.getWord();
         if (getConfiguration().getGeneral().isIncludeArticle()) {
             fullWord = word.getFullWord();
@@ -263,12 +265,12 @@ public class PlayServiceImpl implements PlayService {
         return wordTranslations;
     }
 
-    private void playTranslation(Translation translation) throws InterruptedException {
+    private void playTranslation(Translation translation) {
         delay(getConfiguration().getTranslation().getDelay());
         playAudio(translation.getLanguage(), translation.getTranslation());
     }
 
-    private void spell(Word word) throws InterruptedException {
+    private void spell(Word word) {
         if (getConfiguration().getSpelling().isActive()) {
             delay(getConfiguration().getSpelling().getDelay() - getConfiguration().getSpelling().getLetterDelay());//TODO skip first delay
             for (String letter : word.getWord().split("")) {
@@ -278,9 +280,13 @@ public class PlayServiceImpl implements PlayService {
         }
     }
 
-    private void delay(long delay) throws InterruptedException {
+    public void setDelayProvider(Consumer<Long> delayProvider) {
+        this.delayProvider = delayProvider;
+    }
+
+    private void delay(long delay) {
         if (delay > 0) {
-            Thread.sleep(delay);
+            delayProvider.accept(delay);
         }
     }
 

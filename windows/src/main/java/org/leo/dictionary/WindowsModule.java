@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 import static org.leo.dictionary.db.DatabaseHelper.DB_URL;
 
@@ -119,8 +120,18 @@ public class WindowsModule {
         playService.setConfigurationService(configurationService);
         playService.setAudioService(audioService);
         playService.setWordProvider(wordProvider);
+        playService.setDelayProvider(delayProvider);
         return playService;
     }
+
+    private static final Consumer<Long> delayProvider = delay ->
+    {
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    };
 
     @Provides
     @Singleton
