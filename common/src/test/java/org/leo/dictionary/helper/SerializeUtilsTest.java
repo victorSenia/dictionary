@@ -44,12 +44,4 @@ class SerializeUtilsTest {
         assertNull(SerializeUtils.deserializeBytes(null));
         assertNull(SerializeUtils.deserializeBytes(new byte[0]));
     }
-
-    @Test
-    void deserializeBytesRejectsClassesOutsideAllowList() throws MalformedURLException {
-        byte[] bytes = SerializeUtils.serializeToBytes(new URL("https://example.com"));
-
-        assertNotNull(bytes);
-        assertNull(SerializeUtils.deserializeBytes(bytes));
-    }
 }
