@@ -94,14 +94,14 @@ public class FileWordProvider implements WordProvider {
             words = new ArrayList<>();
             rootTopic = creteRootTopic();
             String line;
-            List<Topic> topicsOfCurrentWors = null;
+            List<Topic> topicsOfCurrentWord = null;
             int limit = configuration.getLanguagesTo().size() + 1;
             while ((line = fileReader.readLine()) != null) {
                 if (isIgnoredLine(line)) {
                     continue;
                 }
                 if (isTopicLine(line)) {
-                    topicsOfCurrentWors = getWordTopics(topicsOfCurrentWors, line);
+                    topicsOfCurrentWord = getWordTopics(topicsOfCurrentWord, line);
                 } else {
                     String[] parsedWord = line.split(configuration.getDelimiter(), limit);
                     if (parsedWord.length == limit) {
@@ -111,13 +111,13 @@ public class FileWordProvider implements WordProvider {
                             Word foundWord = foundWordOptional.get();
                             if (foundWord.getTopics() != null) {
                                 foundWord.setTopics(new ArrayList<>(foundWord.getTopics()));
-                            } else if (topicsOfCurrentWors != null) {
+                            } else if (topicsOfCurrentWord != null) {
                                 foundWord.setTopics(new ArrayList<>());
                             }
-                            addIfNotPresent(foundWord.getTopics(), topicsOfCurrentWors);
+                            addIfNotPresent(foundWord.getTopics(), topicsOfCurrentWord);
                             addIfNotPresent(foundWord.getTranslations(), word.getTranslations());
                         } else {
-                            word.setTopics(topicsOfCurrentWors);
+                            word.setTopics(topicsOfCurrentWord);
                             words.add(word);
                         }
                     } else {

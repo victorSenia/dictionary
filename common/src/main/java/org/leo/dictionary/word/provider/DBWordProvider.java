@@ -16,22 +16,27 @@ public class DBWordProvider implements WordProvider {
     private DatabaseManagerParent<?> databaseManager;
 
     private static Translation findTranslationById(Word word, long id) {
-        for (Translation translation : word.getTranslations()) {
-            if (translation.getId() == id) {
-                return translation;
+        if (word.getTranslations() != null) {
+            for (Translation translation : word.getTranslations()) {
+                if (translation.getId() == id) {
+                    return translation;
+                }
             }
         }
         return null;
     }
 
     private static Topic findTopicById(Word word, long id) {
-        for (Topic topic : word.getTopics()) {
-            if (topic.getId() == id) {
-                return topic;
+        if (word.getTopics() != null) {
+            for (Topic topic : word.getTopics()) {
+                if (topic.getId() == id) {
+                    return topic;
+                }
             }
         }
         return null;
     }
+
     @Override
     public List<Word> findWords(WordCriteria criteria) {
         List<Word> words = databaseManager.getWords(criteria); // get filtered set
@@ -111,28 +116,36 @@ public class DBWordProvider implements WordProvider {
         if (!oldWord.equals(updatedWord)) {
             databaseManager.updateWord(updatedWord);
         }
-        for (Translation translation : updatedWord.getTranslations()) {
-            if (translation.getId() == 0) {
-                databaseManager.insertTranslation(translation, updatedWord.getId());
-            } else if (!translation.equals(findTranslationById(oldWord, translation.getId()))) {
-                databaseManager.updateTranslation(translation);
+        if (updatedWord.getTranslations() != null) {
+            for (Translation translation : updatedWord.getTranslations()) {
+                if (translation.getId() == 0) {
+                    databaseManager.insertTranslation(translation, updatedWord.getId());
+                } else if (!translation.equals(findTranslationById(oldWord, translation.getId()))) {
+                    databaseManager.updateTranslation(translation);
+                }
             }
         }
-        for (Translation translation : oldWord.getTranslations()) {
-            if (findTranslationById(updatedWord, translation.getId()) == null) {
-                databaseManager.deleteTranslation(translation.getId());
+        if (oldWord.getTranslations() != null) {
+            for (Translation translation : oldWord.getTranslations()) {
+                if (findTranslationById(updatedWord, translation.getId()) == null) {
+                    databaseManager.deleteTranslation(translation.getId());
+                }
             }
         }
-        for (Topic topic : updatedWord.getTopics()) {
-            if (topic.getId() == 0) {
-                databaseManager.insertWordTopicLink(updatedWord.getId(), databaseManager.insertTopic(topic));
-            } else if (findTopicById(oldWord, topic.getId()) == null) {
-                databaseManager.insertWordTopicLink(updatedWord.getId(), topic.getId());
+        if (updatedWord.getTopics() != null) {
+            for (Topic topic : updatedWord.getTopics()) {
+                if (topic.getId() == 0) {
+                    databaseManager.insertWordTopicLink(updatedWord.getId(), databaseManager.insertTopic(topic));
+                } else if (findTopicById(oldWord, topic.getId()) == null) {
+                    databaseManager.insertWordTopicLink(updatedWord.getId(), topic.getId());
+                }
             }
         }
-        for (Topic topic : oldWord.getTopics()) {
-            if (findTopicById(updatedWord, topic.getId()) == null) {
-                databaseManager.deleteWordTopicLink(updatedWord.getId(), topic.getId());
+        if (oldWord.getTopics() != null) {
+            for (Topic topic : oldWord.getTopics()) {
+                if (findTopicById(updatedWord, topic.getId()) == null) {
+                    databaseManager.deleteWordTopicLink(updatedWord.getId(), topic.getId());
+                }
             }
         }
         return updatedWord;
