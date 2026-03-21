@@ -10,47 +10,50 @@ public class ConfigParent {
         String fullKey = getClass().getName() + "." + key;
 
         Object v = properties.get(fullKey);
-        if (v != null) {
-            if (defaultValue != null && defaultValue.getClass().isAssignableFrom(v.getClass())) {
-                return (V) v;
-            }
-            if (Collection.class.isAssignableFrom(defaultValue.getClass())) {
-                if (v instanceof Collection) {
+        try {
+            if (v != null && defaultValue != null) {
+                Class<?> defaultClass = defaultValue.getClass();
+                if (defaultClass.isAssignableFrom(v.getClass()) ||
+                        (Collection.class.isAssignableFrom(defaultClass) && v instanceof Collection)) {
                     return (V) v;
                 }
-                String value = v.toString();
-                ArrayList<Object> values = new ArrayList<>();
-                if (!value.isEmpty()) {
-                    Collections.addAll(values, value.split(";"));
-                }
-                if (List.class.isAssignableFrom(defaultValue.getClass())) {
-                    return (V) values;
+                V result;
+                String value = String.valueOf(v);
+                if (Collection.class.isAssignableFrom(defaultClass)) {
+                    ArrayList<Object> values = new ArrayList<>();
+                    if (!value.isEmpty()) {
+                        Collections.addAll(values, value.split(";"));
+                    }
+                    if (List.class.isAssignableFrom(defaultClass)) {
+                        result = (V) values;
+                    } else {
+                        result = (V) new HashSet<>(values);
+                    }
+                } else if (defaultValue instanceof Boolean) {
+                    result = (V) Boolean.valueOf(value);
+                } else if (defaultValue instanceof Integer) {
+                    result = (V) Integer.valueOf(value);
+                } else if (defaultValue instanceof Long) {
+                    result = (V) Long.valueOf(value);
+                } else if (defaultValue instanceof Double) {
+                    result = (V) Double.valueOf(value);
+                } else if (defaultValue instanceof Float) {
+                    result = (V) Float.valueOf(value);
+                } else if (defaultValue instanceof Character) {
+                    result = value.isEmpty() ? defaultValue : (V) Character.valueOf(value.charAt(0));
+                } else if (defaultValue instanceof Byte) {
+                    result = (V) Byte.valueOf(value);
                 } else {
-                    return (V) new HashSet<>(values);
+                    result = (V) v;
                 }
+                defaultValue = result;
             }
-            if (defaultValue instanceof Boolean) {
-                return (V) Boolean.valueOf(v.toString());
-            }
-            if (defaultValue instanceof Integer) {
-                return (V) Integer.valueOf(v.toString());
-            }
-            if (defaultValue instanceof Long) {
-                return (V) Long.valueOf(v.toString());
-            }
-            if (defaultValue instanceof Double) {
-                return (V) Double.valueOf(v.toString());
-            }
-            if (defaultValue instanceof Float) {
-                return (V) Float.valueOf(v.toString());
-            }
-            if (defaultValue instanceof Character) {
-                return (V) v.toString();//TODO
-            }
-            if (defaultValue instanceof Byte) {
-                return (V) Byte.valueOf(v.toString());
-            }
-            return (V) v;
+        } catch (NumberFormatException e) {
+            if (defaultValue instanceof Integer) defaultValue = (V) Integer.valueOf(0);
+            else if (defaultValue instanceof Long) defaultValue = (V) Long.valueOf(0L);
+            else if (defaultValue instanceof Double) defaultValue = (V) Double.valueOf(0.0);
+            else if (defaultValue instanceof Float) defaultValue = (V) Float.valueOf(0.0f);
+            else if (defaultValue instanceof Byte) defaultValue = (V) Byte.valueOf((byte) 0);
         }
         properties.put(fullKey, defaultValue);
         return defaultValue;
