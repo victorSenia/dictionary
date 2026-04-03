@@ -119,7 +119,7 @@ public class WindowsModule {
         PlayServiceImpl playService = new PlayServiceImpl();
         playService.setConfigurationService(configurationService);
         playService.setAudioService(audioService);
-        playService.setWordProvider(wordProvider);
+        playService.setWordUpdater(wordProvider);
         playService.setDelayProvider(delayProvider);
         return playService;
     }

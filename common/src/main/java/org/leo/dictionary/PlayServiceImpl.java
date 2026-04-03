@@ -6,6 +6,7 @@ import org.leo.dictionary.config.entity.Configuration;
 import org.leo.dictionary.entity.Translation;
 import org.leo.dictionary.entity.Word;
 import org.leo.dictionary.word.provider.WordProvider;
+import org.leo.dictionary.word.provider.WordUpdater;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -22,7 +23,7 @@ public class PlayServiceImpl implements PlayService {
     private AudioService audioService;
     private UiUpdater uiUpdater;
 
-    private WordProvider wordProvider;
+    private WordUpdater wordUpdater;
     private ListIterator<Word> wordsIterator;
     private List<Word> words;
     private PlayThread playThread;
@@ -48,8 +49,8 @@ public class PlayServiceImpl implements PlayService {
         this.uiUpdater = uiUpdater;
     }
 
-    public void setWordProvider(WordProvider wordProvider) {
-        this.wordProvider = wordProvider;
+    public void setWordUpdater(WordUpdater wordUpdater) {
+        this.wordUpdater = wordUpdater;
     }
 
     private void stop() {
@@ -223,7 +224,7 @@ public class PlayServiceImpl implements PlayService {
 
     private void updateWord(Word word) {
         word.increaseKnowledge(getConfiguration().getGeneral().getKnowledgeIncrease());
-        wordProvider.updateWord(word);
+        wordUpdater.updateWord(word);
     }
 
     private void playWordAudio(Word word) {

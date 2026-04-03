@@ -101,7 +101,7 @@ class PlayServiceImplTest {
         PlayServiceImpl playService = new PlayServiceImpl();
         playService.setConfigurationService(configurationService);
         playService.setAudioService(audioService);
-        playService.setWordProvider(wordProvider);
+        playService.setWordUpdater(wordProvider);
 
         Word word = new Word();
         word.setLanguage("de");
@@ -147,7 +147,7 @@ class PlayServiceImplTest {
         PlayServiceImpl playService = new PlayServiceImpl();
         playService.setConfigurationService(configurationService);
         playService.setAudioService(audioService);
-        playService.setWordProvider(new WordProvider() {
+        playService.setWordUpdater(new WordProvider() {
             @Override
             public List<Word> findWords(WordCriteria criteria) {
                 return List.of();
@@ -299,7 +299,7 @@ class PlayServiceImplTest {
         PlayServiceImpl playService = new PlayServiceImpl();
         playService.setConfigurationService(configurationService);
         playService.setAudioService(audioService);
-        playService.setWordProvider(new WordProvider() {
+        playService.setWordUpdater(new WordProvider() {
             @Override
             public List<Word> findWords(WordCriteria criteria) {
                 return List.of();
@@ -386,7 +386,7 @@ class PlayServiceImplTest {
         PlayServiceImpl playService = new PlayServiceImpl();
         playService.setConfigurationService(configurationService);
         playService.setAudioService(audioService);
-        playService.setWordProvider(new WordProvider() {
+        playService.setWordUpdater(new WordProvider() {
             @Override
             public List<Word> findWords(WordCriteria criteria) {
                 return List.of();
@@ -465,7 +465,7 @@ class PlayServiceImplTest {
         PlayServiceImpl playService = new PlayServiceImpl();
         playService.setConfigurationService(configurationService);
         playService.setAudioService(audioService);
-        playService.setWordProvider(new WordProvider() {
+        playService.setWordUpdater(new WordProvider() {
             @Override
             public List<Word> findWords(WordCriteria criteria) {
                 return List.of();
@@ -542,7 +542,7 @@ class PlayServiceImplTest {
         PlayServiceImpl playService = new PlayServiceImpl();
         playService.setConfigurationService(configurationService);
         playService.setAudioService(audioService);
-        playService.setWordProvider(new WordProvider() {
+        playService.setWordUpdater(new WordProvider() {
             @Override
             public List<Word> findWords(WordCriteria criteria) {
                 return List.of();
