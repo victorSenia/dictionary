@@ -9,8 +9,11 @@ permissions:
   contents: write
 
 jobs:
-  release-common:
+  release:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Check out source
@@ -24,16 +27,14 @@ jobs:
 
       - name: Resolve version
         id: version
-        shell: bash
         run: |
           version="${GITHUB_REF_NAME#v}"
           echo "value=$version" >> "$GITHUB_OUTPUT"
 
       - name: Build release artifacts
-        run: mvn -B -ntp package -DskipTests -Drevision=${{ steps.version.outputs.value }}
+        run: mvn -B -ntp package -DskipTests -Drevision="${{ steps.version.outputs.value }}"
 
       - name: Prepare release artifacts
-        shell: bash
         run: |
           mkdir -p release-assets
           cp common/target/common-${{ steps.version.outputs.value }}.jar release-assets/common-${{ steps.version.outputs.value }}.jar
@@ -47,7 +48,6 @@ jobs:
           files: release-assets/*.jar
 
       - name: Bump next snapshot version
-        shell: bash
         run: |
           IFS='.' read -r major minor patch <<< "${{ steps.version.outputs.value }}"
           next_patch=$((patch + 1))
@@ -56,7 +56,6 @@ jobs:
           echo "next_version=${next_version}" >> "$GITHUB_ENV"
 
       - name: Commit next snapshot version
-        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
