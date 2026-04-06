@@ -1,0 +1,66 @@
+name: Build Release Artifacts
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release-common:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Build release artifacts
+        run: mvn -B -ntp package -DskipTests -Drevision=${{ steps.version.outputs.value }}
+
+      - name: Prepare release artifacts
+        shell: bash
+        run: |
+          mkdir -p release-assets
+          cp common/target/common-${{ steps.version.outputs.value }}.jar release-assets/common-${{ steps.version.outputs.value }}.jar
+          cp windows/target/windows-${{ steps.version.outputs.value }}-jar-with-dependencies.jar release-assets/windows-${{ steps.version.outputs.value }}.jar
+
+      - name: Create GitHub release and upload artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          files: release-assets/*.jar
+
+      - name: Bump next snapshot version
+        shell: bash
+        run: |
+          IFS='.' read -r major minor patch <<< "${{ steps.version.outputs.value }}"
+          next_patch=$((patch + 1))
+          next_version="${major}.${minor}.${next_patch}-SNAPSHOT"
+          sed -i "s|<revision>.*</revision>|<revision>${next_version}</revision>|" pom.xml
+          echo "next_version=${next_version}" >> "$GITHUB_ENV"
+
+      - name: Commit next snapshot version
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout master
+          git add pom.xml
+          git commit -m "Bump version to ${next_version}"
+          git push origin master
