@@ -9,10 +9,9 @@
 
     <groupId>org.leo.dictionary</groupId>
     <artifactId>windows</artifactId>
-    <packaging>jar</packaging>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javafx.version>23.0.1</javafx.version>
     </properties>
 
     <dependencies>
@@ -33,19 +32,19 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>23.0.1</version>
+            <version>${javafx.version}</version>
         </dependency>
 
         <!-- Optional: if you use FXML -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>23.0.1</version>
+            <version>${javafx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
-            <version>23.0.1</version>
+            <version>${javafx.version}</version>
         </dependency>
     </dependencies>
     <build>
