@@ -11,9 +11,8 @@ permissions:
 jobs:
   release:
     runs-on: windows-latest
-    defaults:
-      run:
-        shell: bash
+    env:
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
 
     steps:
       - name: Check out source
@@ -28,17 +27,42 @@ jobs:
       - name: Resolve version
         id: version
         run: |
-          version="${GITHUB_REF_NAME#v}"
-          echo "value=$version" >> "$GITHUB_OUTPUT"
+          $version = "${env:GITHUB_REF_NAME}".Substring(1)
+          "value=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Verify tag matches current version and default branch head
+        run: |
+          [xml]$pom = Get-Content pom.xml
+          $currentRevision = $pom.project.properties.revision
+          if ([string]::IsNullOrWhiteSpace($currentRevision)) {
+            Write-Error "Could not find project.properties.revision in pom.xml."
+            exit 1
+          }
+          if (-not $currentRevision.EndsWith("-SNAPSHOT")) {
+            Write-Error "Current revision '$currentRevision' is not a -SNAPSHOT version."
+            exit 1
+          }
+          $expectedTagVersion = $currentRevision.Substring(0, $currentRevision.Length - "-SNAPSHOT".Length)
+          if ("${{ steps.version.outputs.value }}" -ne $expectedTagVersion) {
+            Write-Error "Tag version '${{ steps.version.outputs.value }}' does not match current revision '$currentRevision'. Expected tag v$expectedTagVersion."
+            exit 1
+          }
+          git fetch origin $env:DEFAULT_BRANCH --depth=1
+          $tagCommit = (git rev-parse HEAD).Trim()
+          $defaultBranchCommit = (git rev-parse "origin/$env:DEFAULT_BRANCH").Trim()
+          if ($tagCommit -ne $defaultBranchCommit) {
+            Write-Error "Tag commit $tagCommit does not match origin/$env:DEFAULT_BRANCH $defaultBranchCommit. Refusing to release from one commit and bump another."
+            exit 1
+          }
 
       - name: Build release artifacts
-        run: mvn -B -ntp package -DskipTests -Drevision="${{ steps.version.outputs.value }}"
+        run: mvn -B -ntp package "-Drevision=${{ steps.version.outputs.value }}"
 
       - name: Prepare release artifacts
         run: |
-          mkdir -p release-assets
-          cp common/target/common-${{ steps.version.outputs.value }}.jar release-assets/common-${{ steps.version.outputs.value }}.jar
-          cp windows/target/windows-${{ steps.version.outputs.value }}-jar-with-dependencies.jar release-assets/windows-${{ steps.version.outputs.value }}.jar
+          New-Item -ItemType Directory -Force -Path release-assets | Out-Null
+          Copy-Item "common/target/common-${{ steps.version.outputs.value }}.jar" "release-assets/common-${{ steps.version.outputs.value }}.jar"
+          Copy-Item "windows/target/windows-${{ steps.version.outputs.value }}-jar-with-dependencies.jar" "release-assets/windows-${{ steps.version.outputs.value }}.jar"
 
       - name: Create GitHub release and upload artifacts
         uses: softprops/action-gh-release@v2
@@ -47,19 +71,27 @@ jobs:
           name: ${{ github.ref_name }}
           files: release-assets/*.jar
 
-      - name: Bump next snapshot version
+      - name: Prepare next snapshot version
         run: |
-          IFS='.' read -r major minor patch <<< "${{ steps.version.outputs.value }}"
-          next_patch=$((patch + 1))
-          next_version="${major}.${minor}.${next_patch}-SNAPSHOT"
-          sed -i "s|<revision>.*</revision>|<revision>${next_version}</revision>|" pom.xml
-          echo "next_version=${next_version}" >> "$GITHUB_ENV"
+          git checkout -B $env:DEFAULT_BRANCH "origin/$env:DEFAULT_BRANCH"
+          $parts = "${{ steps.version.outputs.value }}".Split(".")
+          $nextPatch = [int]$parts[2] + 1
+          $nextVersion = "$($parts[0]).$($parts[1]).$nextPatch-SNAPSHOT"
+          [xml]$pom = Get-Content pom.xml
+          $pom.project.properties.revision = $nextVersion
+          $settings = New-Object System.Xml.XmlWriterSettings
+          $settings.Indent = $true
+          $settings.OmitXmlDeclaration = $false
+          $settings.Encoding = [System.Text.UTF8Encoding]::new($false)
+          $writer = [System.Xml.XmlWriter]::Create("pom.xml", $settings)
+          $pom.Save($writer)
+          $writer.Dispose()
+          "next_version=$nextVersion" >> $env:GITHUB_ENV
 
       - name: Commit next snapshot version
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout master
           git add pom.xml
-          git commit -m "Bump version to ${next_version}"
-          git push origin master
+          git commit -m "Prepare next version $env:next_version"
+          git push origin "HEAD:$env:DEFAULT_BRANCH"
