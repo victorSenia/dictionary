@@ -5,6 +5,7 @@ import org.leo.dictionary.entity.GrammarCriteria;
 import org.leo.dictionary.entity.GrammarSentence;
 import org.leo.dictionary.entity.Hint;
 import org.leo.dictionary.entity.Topic;
+import org.leo.dictionary.word.provider.WordExporter;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -15,8 +16,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.leo.dictionary.word.provider.FileWordProvider.decode;
+import static org.leo.dictionary.word.provider.FileWordProvider.encode;
+
 public class FileGrammarProvider implements GrammarProvider {
     private final static Logger LOGGER = Logger.getLogger(FileGrammarProvider.class.getName());
+    public static final String PARSE_GRAMMAR_CONFIGURATION = "org.leo.dictionary.config.entity.ParseGrammar";
 
     protected ParseGrammar configuration;
     protected Set<Hint> hints;
@@ -115,7 +120,6 @@ public class FileGrammarProvider implements GrammarProvider {
                     }
                 }
             }
-//            wordsToFile(configuration.getPath() + "__", words);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -130,7 +134,7 @@ public class FileGrammarProvider implements GrammarProvider {
     }
 
     protected boolean isIgnoredLine(String line) {
-        return line == null || line.isEmpty();
+        return line == null || line.isEmpty() || isConfigurationLine(line);
     }
 
     private <V> void addIfNotPresent(List<V> list, List<V> addList) {
@@ -202,26 +206,49 @@ public class FileGrammarProvider implements GrammarProvider {
         return line.matches("^" + configuration.getHintFlag() + ".+");
     }
 
-    protected BufferedWriter getBufferedWriter(String path) throws IOException {
-        return new BufferedWriter(new FileWriter(path, StandardCharsets.UTF_8));
-    }
-
-    protected String trimTopic(String topic, String previousTopic) {
-        while (previousTopic != null) {
-            if (topic.startsWith(previousTopic + System.lineSeparator())) {
-                return topic.substring(previousTopic.length() + System.lineSeparator().length());
-            }
-            if (previousTopic.contains(System.lineSeparator())) {
-                previousTopic = previousTopic.substring(0, previousTopic.lastIndexOf(System.lineSeparator()));
-            } else {
-                previousTopic = null;
-            }
-        }
-        return topic;
-    }
-
     @Override
     public List<String> languages() {
         return Collections.singletonList(configuration.getLanguage());
+    }
+
+    private static boolean isConfigurationLine(String line) {
+        return line.startsWith(PARSE_GRAMMAR_CONFIGURATION);
+    }
+
+    public void parseAndUpdateConfiguration() {
+        try (BufferedReader fileReader = getBufferedReader()) {
+            String line;
+            while ((line = fileReader.readLine()) != null) {
+                if (isConfigurationLine(line)) {
+                    String[] configParts = line.split(WordExporter.MAIN_DIVIDER, -1);
+                    if (configParts.length < 8) {
+                        throw new IllegalArgumentException("config incorrect " + line);
+                    }
+                    configuration.setLanguage(decode(configParts[1]));
+                    configuration.setDelimiter(decode(configParts[2]));
+                    configuration.setPlaceholder(decode(configParts[3]));
+                    configuration.setHintAtSameLine(Boolean.parseBoolean(configParts[4]));
+                    configuration.setTopicFlag(decode(configParts[5]));
+                    configuration.setHintFlag(decode(configParts[6]));
+                    configuration.setRootTopic(decode(configParts[7]));
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String configurationToLine() {
+        return String.join(WordExporter.MAIN_DIVIDER, new String[]{
+                PARSE_GRAMMAR_CONFIGURATION,
+                encode(configuration.getLanguage()),
+                encode(configuration.getDelimiter()),
+                encode(configuration.getPlaceholder()),
+                Boolean.toString(configuration.getHintAtSameLine()),
+                encode(configuration.getTopicFlag()),
+                encode(configuration.getHintFlag()),
+                encode(configuration.getRootTopic())
+        });
     }
 }
