@@ -19,6 +19,7 @@ public class FileWordProvider implements WordProvider {
     public static final String PARSE_WORDS_CONFIGURATION = "org.leo.dictionary.config.entity.ParseWords";
 
     protected ParseWords configuration;
+    private boolean configurationParsed;
     protected Map<String, Topic> topics;
     protected Topic rootTopic;
     protected List<Word> words;
@@ -357,12 +358,17 @@ public class FileWordProvider implements WordProvider {
                     configuration.setTopicFlag(decode(configParts[7]));
                     configuration.setTopicDelimiter(decode(configParts[8]));
                     configuration.setRootTopic(decode(configParts[9]));
+                    configurationParsed = true;
                     break;
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean isConfigurationParsed() {
+        return configurationParsed;
     }
 
     public String configurationToLine() {
@@ -379,6 +385,7 @@ public class FileWordProvider implements WordProvider {
                 encode(configuration.getRootTopic())
         });
     }
+
     @Override
     public List<Word> findKnownWords() {
         return new ArrayList<>();
@@ -393,4 +400,5 @@ public class FileWordProvider implements WordProvider {
     public List<String> languageTo(String language) {
         return configuration.getLanguagesTo();
     }
+
 }
